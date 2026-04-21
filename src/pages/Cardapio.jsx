@@ -12,7 +12,7 @@ export default function Cardapio() {
   const [showFormPedido, setShowFormPedido] = useState(false)
   const [pedidoEnviado, setPedidoEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
-  const [tipoEntrega, setTipoEntrega] = useState('Entrega') // "Entrega" ou "Retirada"
+  const [tipoEntrega, setTipoEntrega] = useState('Entrega')
   const [form, setForm] = useState({ clienteNome: '', clienteTelefone: '', endereco: '' })
 
   useEffect(() => {
@@ -68,13 +68,19 @@ export default function Cardapio() {
     }
     setEnviando(true)
     try {
-      await api.post('/pedidos', {
+      const response = await api.post('/pedidos', {
         clienteNome: form.clienteNome,
         clienteTelefone: form.clienteTelefone,
         endereco: tipoEntrega === 'Retirada' ? 'Retirada no balcão' : form.endereco,
         tipoEntrega,
         itens: carrinho.map(i => ({ produtoId: i.id, quantidade: i.quantidade }))
       })
+
+      // 🔥 Abre o WhatsApp automaticamente
+      if (response.data.whatsapp) {
+        window.open(response.data.whatsapp, '_blank')
+      }
+
       setCarrinho([])
       setShowCarrinho(false)
       setShowFormPedido(false)
@@ -147,7 +153,6 @@ export default function Cardapio() {
         DELÍCIAS DA MILA © {new Date().getFullYear()} — FEITO COM ❤️
       </div>
 
-      {/* Drawer do Carrinho */}
       {showCarrinho && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
           <div onClick={() => { setShowCarrinho(false); setShowFormPedido(false) }} style={{ flex: 1, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} />
@@ -188,25 +193,14 @@ export default function Cardapio() {
 
             {carrinho.length > 0 && (
               <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-
-                {/* Tipo de entrega */}
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginBottom: '10px' }}>COMO DESEJA RECEBER?</div>
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <TipoBtn
-                      label="🛵 Entrega"
-                      active={tipoEntrega === 'Entrega'}
-                      onClick={() => setTipoEntrega('Entrega')}
-                    />
-                    <TipoBtn
-                      label="🏪 Retirada no balcão"
-                      active={tipoEntrega === 'Retirada'}
-                      onClick={() => setTipoEntrega('Retirada')}
-                    />
+                    <TipoBtn label="🛵 Entrega" active={tipoEntrega === 'Entrega'} onClick={() => setTipoEntrega('Entrega')} />
+                    <TipoBtn label="🏪 Retirada no balcão" active={tipoEntrega === 'Retirada'} onClick={() => setTipoEntrega('Retirada')} />
                   </div>
                 </div>
 
-                {/* Totais */}
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>
                     <span>Subtotal</span>
@@ -226,7 +220,6 @@ export default function Cardapio() {
                   </div>
                 </div>
 
-                {/* Formulário */}
                 {showFormPedido && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
@@ -268,14 +261,7 @@ export default function Cardapio() {
 
 function TipoBtn({ label, active, onClick }) {
   return (
-    <button onClick={onClick} style={{
-      flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer',
-      border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)',
-      background: active ? 'rgba(236,72,153,0.15)' : 'transparent',
-      color: active ? '#ec4899' : 'rgba(255,255,255,0.4)',
-      fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif',
-      transition: 'all 0.2s'
-    }}>
+    <button onClick={onClick} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: active ? 'rgba(236,72,153,0.15)' : 'transparent', color: active ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif', transition: 'all 0.2s' }}>
       {label}
     </button>
   )
