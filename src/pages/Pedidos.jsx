@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom";
 const API_URL = "https://delicias-da-mila-api-production.up.railway.app/api";
 
 // Enum igual ao C#:
-// 0 = Pendente, 1 = Confirmado, 2 = EmPreparo, 3 = Entregue, 4 = Cancelado
+// 0 = Pendente, 1 = Confirmado, 2 = EmPreparo, 3 = Pronto, 4 = Entregue, 5 = Cancelado
 const STATUS_ENUM = {
   Pendente: 0,
   Confirmado: 1,
   EmPreparo: 2,
-  Entregue: 3,
-  Cancelado: 4
+  Pronto: 3,
+  Entregue: 4,
+  Cancelado: 5
 };
 
 function Pedidos() {
@@ -98,11 +99,7 @@ function Pedidos() {
     .reduce((acc, p) => acc + p.total, 0);
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#0f0f0f",
-      fontFamily: "'Georgia', serif", color: "#fff",
-      position: "relative", overflow: "hidden"
-    }}>
+    <div style={{ minHeight: "100vh", background: "#0f0f0f", fontFamily: "'Georgia', serif", color: "#fff", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "fixed", top: "-200px", right: "-200px", width: "600px", height: "600px", borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "fixed", bottom: "-100px", left: "-100px", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
 
@@ -185,6 +182,7 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
     "Pendente":   { cor: "249,115,22", label: "🟡 Pendente" },
     "Confirmado": { cor: "59,130,246", label: "🔵 Confirmado" },
     "EmPreparo":  { cor: "236,72,153", label: "🔴 Em Preparo" },
+    "Pronto":     { cor: "168,85,247", label: "🟣 Pronto" },
     "Entregue":   { cor: "34,197,94",  label: "🟢 Entregue" },
     "Cancelado":  { cor: "239,68,68",  label: "⚫ Cancelado" },
   };
@@ -236,19 +234,31 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
             <span>{pedido.tipoEntrega === "Retirada" ? "🏪 Retirada no balcão" : "🛵 Taxa de entrega: R$ 5,00"}</span>
           </div>
 
+          {/* Botões de ação */}
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+
+            {/* Pendente → Iniciar Preparo ou Cancelar */}
             {pedido.status === "Pendente" && (
               <>
                 <BotaoAcao label={carregando ? "Aguarde..." : "🔴 Iniciar Preparo"} cor="236,72,153" onClick={() => handleStatus("EmPreparo")} disabled={carregando} />
                 <BotaoAcao label="⚫ Cancelar" cor="239,68,68" outline onClick={() => handleStatus("Cancelado")} disabled={carregando} />
               </>
             )}
+
+            {/* Em Preparo → Pedido Pronto */}
             {pedido.status === "EmPreparo" && (
-              <BotaoAcao label={carregando ? "Aguarde..." : "🟢 Pedido Pronto — Marcar Entregue"} cor="34,197,94" onClick={() => handleStatus("Entregue")} disabled={carregando} />
+              <BotaoAcao label={carregando ? "Aguarde..." : "🟣 Pedido Pronto"} cor="168,85,247" onClick={() => handleStatus("Pronto")} disabled={carregando} />
             )}
+
+            {/* Pronto → Finalizar Pedido (após entrega confirmada) */}
+            {pedido.status === "Pronto" && (
+              <BotaoAcao label={carregando ? "Aguarde..." : "🟢 Finalizar Pedido"} cor="34,197,94" onClick={() => handleStatus("Entregue")} disabled={carregando} />
+            )}
+
             {pedido.status === "Entregue" && (
               <div style={{ fontSize: "13px", color: "rgba(34,197,94,0.7)", padding: "8px 0" }}>✅ Pedido finalizado e entregue</div>
             )}
+
             {pedido.status === "Cancelado" && (
               <div style={{ fontSize: "13px", color: "rgba(239,68,68,0.7)", padding: "8px 0" }}>❌ Pedido cancelado</div>
             )}
