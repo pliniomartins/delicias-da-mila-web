@@ -180,7 +180,7 @@ export default function Dashboard() {
               WebkitTextFillColor: 'transparent',
               lineHeight: 1.2
             }}>
-              Bom dia, Mila! ☀️
+             Olá, Mila! ☀️
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '10px', fontSize: '15px' }}>
               Gerencie seu negócio com estilo e sabor. 🍫

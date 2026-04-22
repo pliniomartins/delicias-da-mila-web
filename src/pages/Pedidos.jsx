@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://delicias-da-mila-api-production.up.railway.app/api";
 
-// Enum igual ao C#:
-// 0 = Pendente, 1 = Confirmado, 2 = EmPreparo, 3 = Pronto, 4 = Entregue, 5 = Cancelado
 const STATUS_ENUM = {
   Pendente: 0,
   Confirmado: 1,
@@ -39,7 +37,6 @@ function Pedidos() {
     try {
       const res = await fetch(`${API_URL}/Pedidos`);
       const data = await res.json();
-
       if (data.length > 0) {
         const idMaisRecente = data[0].id;
         if (ultimoIdRef.current === null) {
@@ -53,7 +50,6 @@ function Pedidos() {
       } else {
         if (ultimoIdRef.current === null) ultimoIdRef.current = 0;
       }
-
       setPedidos(data);
     } catch (error) {
       console.error("Erro ao buscar pedidos", error);
@@ -68,7 +64,6 @@ function Pedidos() {
         body: JSON.stringify({ status })
       });
       if (res.ok) await buscarPedidos();
-      else console.error("Erro ao atualizar status:", await res.text());
     } catch (error) {
       console.error("Erro ao atualizar status", error);
     }
@@ -90,13 +85,8 @@ function Pedidos() {
     return () => clearInterval(interval);
   }, []);
 
-  const pedidosHoje = pedidos.filter(
-    (p) => new Date(p.criadoEm).toDateString() === new Date().toDateString()
-  ).length;
-
-  const totalHoje = pedidos
-    .filter((p) => new Date(p.criadoEm).toDateString() === new Date().toDateString())
-    .reduce((acc, p) => acc + p.total, 0);
+  const pedidosHoje = pedidos.filter(p => new Date(p.criadoEm).toDateString() === new Date().toDateString()).length;
+  const totalHoje = pedidos.filter(p => new Date(p.criadoEm).toDateString() === new Date().toDateString()).reduce((acc, p) => acc + p.total, 0);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f0f0f", fontFamily: "'Georgia', serif", color: "#fff", position: "relative", overflow: "hidden" }}>
@@ -130,8 +120,7 @@ function Pedidos() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "32px" }}>
           <StatCard emoji="📦" label="Pedidos hoje" value={pedidosHoje} cor="236,72,153" />
           <StatCard emoji="💰" label="Faturamento hoje" value={`R$ ${totalHoje.toFixed(2)}`} cor="34,197,94" />
-          <StatCard emoji="🕐" label="Último pedido" cor="249,115,22"
-            value={pedidos.length > 0 ? new Date(pedidos[0].criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"} />
+          <StatCard emoji="🕐" label="Último pedido" cor="249,115,22" value={pedidos.length > 0 ? new Date(pedidos[0].criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"} />
         </div>
 
         <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", letterSpacing: "1px", marginBottom: "16px" }}>
@@ -188,6 +177,12 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
   };
   const status = statusMap[pedido.status] || { cor: "249,115,22", label: pedido.status };
 
+  const pagamentoIcon = {
+    "Dinheiro": "💵",
+    "Pix": "🔑",
+    "Cartão": "💳"
+  };
+
   async function handleStatus(novoStatus) {
     setCarregando(true);
     await onAtualizarStatus(pedido.id, STATUS_ENUM[novoStatus]);
@@ -229,36 +224,39 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
             </div>
           ))}
 
-          <div style={{ marginTop: "14px", marginBottom: "20px", display: "flex", justifyContent: "space-between", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
+          <div style={{ marginTop: "14px", marginBottom: "12px", display: "flex", justifyContent: "space-between", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
             <span>📞 {pedido.clienteTelefone}</span>
             <span>{pedido.tipoEntrega === "Retirada" ? "🏪 Retirada no balcão" : "🛵 Taxa de entrega: R$ 5,00"}</span>
           </div>
 
-          {/* Botões de ação */}
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {/* Pagamento */}
+          {pedido.formaPagamento && (
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px" }}>
+              <span style={{ fontSize: "18px" }}>{pagamentoIcon[pedido.formaPagamento] || "💳"}</span>
+              <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                {pedido.formaPagamento}
+                {pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 && ` — Troco para R$ ${pedido.troco.toFixed(2)}`}
+                {pedido.formaPagamento === "Pix" && " — Chave: 81997307264"}
+              </span>
+            </div>
+          )}
 
-            {/* Pendente → Iniciar Preparo ou Cancelar */}
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
             {pedido.status === "Pendente" && (
               <>
                 <BotaoAcao label={carregando ? "Aguarde..." : "🔴 Iniciar Preparo"} cor="236,72,153" onClick={() => handleStatus("EmPreparo")} disabled={carregando} />
                 <BotaoAcao label="⚫ Cancelar" cor="239,68,68" outline onClick={() => handleStatus("Cancelado")} disabled={carregando} />
               </>
             )}
-
-            {/* Em Preparo → Pedido Pronto */}
             {pedido.status === "EmPreparo" && (
               <BotaoAcao label={carregando ? "Aguarde..." : "🟣 Pedido Pronto"} cor="168,85,247" onClick={() => handleStatus("Pronto")} disabled={carregando} />
             )}
-
-            {/* Pronto → Finalizar Pedido (após entrega confirmada) */}
             {pedido.status === "Pronto" && (
               <BotaoAcao label={carregando ? "Aguarde..." : "🟢 Finalizar Pedido"} cor="34,197,94" onClick={() => handleStatus("Entregue")} disabled={carregando} />
             )}
-
             {pedido.status === "Entregue" && (
               <div style={{ fontSize: "13px", color: "rgba(34,197,94,0.7)", padding: "8px 0" }}>✅ Pedido finalizado e entregue</div>
             )}
-
             {pedido.status === "Cancelado" && (
               <div style={{ fontSize: "13px", color: "rgba(239,68,68,0.7)", padding: "8px 0" }}>❌ Pedido cancelado</div>
             )}
