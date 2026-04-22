@@ -10,7 +10,7 @@ export default function Cardapio() {
   const [carrinho, setCarrinho] = useState([])
   const [showCarrinho, setShowCarrinho] = useState(false)
   const [showFormPedido, setShowFormPedido] = useState(false)
-  const [pedidoEnviado, setPedidoEnviado] = useState(false)
+  const [pedidoConfirmado, setPedidoConfirmado] = useState(null) // { tempoEspera, previsao }
   const [enviando, setEnviando] = useState(false)
   const [tipoEntrega, setTipoEntrega] = useState('Entrega')
   const [formaPagamento, setFormaPagamento] = useState('')
@@ -95,8 +95,14 @@ export default function Cardapio() {
       setTipoEntrega('Entrega')
       setFormaPagamento('')
       setTroco('')
-      setPedidoEnviado(true)
-      setTimeout(() => setPedidoEnviado(false), 5000)
+
+      // Mostrar tela de confirmação com tempo
+      setPedidoConfirmado({
+        tempoEspera: response.data.tempoEspera,
+        previsao: response.data.previsao,
+        pedidoId: response.data.pedidoId
+      })
+
     } catch {
       alert('Erro ao enviar pedido. Tente novamente.')
     } finally {
@@ -112,16 +118,64 @@ export default function Cardapio() {
     </div>
   )
 
+  // Tela de confirmação do pedido
+  if (pedidoConfirmado) return (
+    <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
+      <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      <div style={{ fontSize: '80px', marginBottom: '24px', animation: 'bounce 1s ease' }}>✅</div>
+      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px', background: 'linear-gradient(135deg, #fff, #f9a8d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        Pedido #{pedidoConfirmado.pedidoId} enviado!
+      </h1>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '40px' }}>
+        A Mila já recebeu seu pedido 🎉
+      </p>
+
+      {/* Card de tempo */}
+      <div style={{
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(236,72,153,0.3)',
+        borderRadius: '20px',
+        padding: '32px 48px',
+        marginBottom: '32px',
+        maxWidth: '340px',
+        width: '100%'
+      }}>
+        <div style={{ fontSize: '48px', marginBottom: '12px' }}>⏱️</div>
+        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>
+          TEMPO ESTIMADO
+        </div>
+        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#ec4899', marginBottom: '8px' }}>
+          {pedidoConfirmado.tempoEspera} min
+        </div>
+        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
+          Previsão: até às <strong style={{ color: '#fff' }}>{pedidoConfirmado.previsao}</strong>
+        </div>
+      </div>
+
+      <button
+        onClick={() => setPedidoConfirmado(null)}
+        style={{
+          background: 'linear-gradient(135deg, #ec4899, #be185d)',
+          border: 'none', color: '#fff', padding: '14px 40px',
+          borderRadius: '12px', fontSize: '15px', fontWeight: 'bold',
+          cursor: 'pointer', fontFamily: 'Georgia, serif',
+          boxShadow: '0 4px 20px rgba(236,72,153,0.4)'
+        }}
+      >
+        Voltar ao cardápio
+      </button>
+
+      <style>{`
+        @keyframes bounce { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
+      `}</style>
+    </div>
+  )
+
   return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'fixed', bottom: '-100px', left: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-      {pedidoEnviado && (
-        <div style={{ position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', padding: '16px 32px', borderRadius: '14px', fontSize: '15px', fontWeight: 'bold', zIndex: 999, boxShadow: '0 8px 30px rgba(34,197,94,0.4)', animation: 'slideDown 0.3s ease' }}>
-          ✅ Pedido enviado! A Mila já recebeu! 🎉
-        </div>
-      )}
 
       <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15,15,15,0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -199,7 +253,6 @@ export default function Cardapio() {
 
             {carrinho.length > 0 && (
               <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                {/* Tipo de entrega */}
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginBottom: '10px' }}>COMO DESEJA RECEBER?</div>
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -208,7 +261,6 @@ export default function Cardapio() {
                   </div>
                 </div>
 
-                {/* Totais */}
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>
                     <span>Subtotal</span><span>R$ {totalPreco.toFixed(2)}</span>
@@ -227,7 +279,6 @@ export default function Cardapio() {
                   </div>
                 </div>
 
-                {/* Formulário */}
                 {showFormPedido && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
@@ -242,7 +293,6 @@ export default function Cardapio() {
                       </div>
                     )}
 
-                    {/* Forma de pagamento */}
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginTop: '6px' }}>FORMA DE PAGAMENTO</div>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {['Dinheiro', 'Pix', 'Cartão'].map(op => (
@@ -258,12 +308,10 @@ export default function Cardapio() {
                       ))}
                     </div>
 
-                    {/* Troco */}
                     {formaPagamento === 'Dinheiro' && (
                       <FormInput placeholder="Troco para quanto? (ex: 50.00)" value={troco} onChange={e => setTroco(e.target.value)} />
                     )}
 
-                    {/* Chave Pix */}
                     {formaPagamento === 'Pix' && (
                       <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '10px', padding: '12px 14px' }}>
                         <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>CHAVE PIX</div>
@@ -271,6 +319,11 @@ export default function Cardapio() {
                         <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>Envie o comprovante pelo WhatsApp</div>
                       </div>
                     )}
+
+                    {/* Aviso de tempo */}
+                    <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', color: '#f97316', textAlign: 'center' }}>
+                      ⏱️ Tempo estimado de espera: <strong>30 minutos</strong>
+                    </div>
                   </div>
                 )}
 
