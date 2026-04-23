@@ -14,95 +14,103 @@ const STATUS_ENUM = {
 };
 
 function imprimirPedido(pedido) {
-  const sep = "********************************";
-  const linha = "--------------------------------";
-  const pontilhado = "................................";
-
-  let texto = `${sep}\n`;
-  texto += `       DELICIAS DA MILA\n`;
-  texto += `${sep}\n\n`;
-  texto += pedido.tipoEntrega === "Retirada"
-    ? `       RETIRADA NO LOCAL\n`
-    : `           DELIVERY\n`;
-  texto += `${pontilhado}\n`;
-  texto += `Cliente: ${pedido.clienteNome}\n`;
-  texto += `Tel: ${pedido.clienteTelefone}\n`;
-  if (pedido.tipoEntrega !== "Retirada") texto += `End: ${pedido.endereco}\n`;
-  texto += `Data: ${new Date(pedido.criadoEm).toLocaleString("pt-BR")}\n`;
-  texto += `Pedido #${pedido.id}\n`;
-  texto += `${pontilhado}\n\n`;
-  texto += `Itens\n`;
-  texto += `${linha}\n`;
-
+  const janela = window.open("", "_blank", "width=300,height=500")
+  
+  let itensHtml = ""
   pedido.itens?.forEach(item => {
-    texto += `(${item.quantidade}) ${item.produtoNome}\n`;
-    texto += `   R$ ${item.precoUnitario.toFixed(2)} x ${item.quantidade} = R$ ${item.subtotal.toFixed(2)}\n`;
-  });
+    itensHtml += `
+      <tr>
+        <td>${item.quantidade}x ${item.produtoNome}</td>
+        <td style="text-align:right">R$ ${item.subtotal.toFixed(2)}</td>
+      </tr>
+    `
+  })
 
-  texto += `${linha}\n`;
-  if (pedido.tipoEntrega !== "Retirada")
-    texto += `Taxa de entrega:        R$ 5,00\n`;
-  else
-    texto += `Retirada no local:      Gratis\n`;
-  texto += `${linha}\n`;
-  texto += `Total:                 R$ ${pedido.total.toFixed(2)}\n`;
-  texto += `${pontilhado}\n`;
-  texto += `Pagamento: ${pedido.formaPagamento || "Nao informado"}\n`;
-  if (pedido.formaPagamento === "Dinheiro" && pedido.troco > 0)
-    texto += `Troco para: R$ ${pedido.troco.toFixed(2)}\n`;
-  if (pedido.formaPagamento === "Pix")
-    texto += `Chave Pix: 81997307264\n`;
-  texto += `${sep}\n`;
-  texto += `  Agradecemos pela preferencia!\n`;
-  texto += `${sep}\n`;
-
-  const janela = window.open("", "_blank", "width=400,height=600")
   janela.document.write(`
     <html>
       <head>
-        <title>Pedido #${pedido.id} - Delicias da Mila</title>
+        <title>Pedido #${pedido.id}</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: 900;
-            color: #000000;
-            background: #ffffff;
-            padding: 10px;
-            white-space: pre;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000;
+            background: #fff;
+            width: 58mm;
+            padding: 2mm;
           }
-          .btn-imprimir {
+          .center { text-align: center; }
+          .bold { font-weight: 900; }
+          .linha { border-top: 1px dashed #000; margin: 4px 0; }
+          table { width: 100%; border-collapse: collapse; }
+          td { font-size: 11px; font-weight: bold; padding: 1px 0; }
+          .total { font-size: 13px; font-weight: 900; }
+          .btn {
             display: block;
             width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 8px;
+            margin-bottom: 8px;
             background: #ec4899;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
           }
           @media print {
-            .btn-imprimir { display: none; }
+            .btn { display: none; }
             body { 
-              padding: 0;
-              font-size: 13px;
-              font-weight: 900;
-              color: #000000;
+              width: 58mm;
+              margin: 0;
+              padding: 1mm;
+            }
+            @page {
+              size: 58mm auto;
+              margin: 0;
             }
           }
         </style>
       </head>
       <body>
-        <button class="btn-imprimir" onclick="window.print();">
-          🖨️ Imprimir Pedido
-        </button>
-        ${texto.replace(/\n/g, '<br>')}
+        <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+        
+        <div class="center bold">DELICIAS DA MILA</div>
+        <div class="center">${pedido.tipoEntrega === "Retirada" ? "RETIRADA NO LOCAL" : "DELIVERY"}</div>
+        <div class="linha"></div>
+        
+        <div>Pedido: #${pedido.id}</div>
+        <div>Cliente: ${pedido.clienteNome}</div>
+        <div>Tel: ${pedido.clienteTelefone}</div>
+        ${pedido.tipoEntrega !== "Retirada" ? `<div>End: ${pedido.endereco}</div>` : ""}
+        <div>Data: ${new Date(pedido.criadoEm).toLocaleString("pt-BR")}</div>
+        
+        <div class="linha"></div>
+        <div class="bold">ITENS:</div>
+        <table>
+          ${itensHtml}
+        </table>
+        <div class="linha"></div>
+        
+        ${pedido.tipoEntrega !== "Retirada" ? `<table><tr><td>Taxa entrega</td><td style="text-align:right">R$ 5,00</td></tr></table>` : ""}
+        
+        <table>
+          <tr>
+            <td class="total bold">TOTAL</td>
+            <td class="total bold" style="text-align:right">R$ ${pedido.total.toFixed(2)}</td>
+          </tr>
+        </table>
+        
+        <div class="linha"></div>
+        <div>Pagamento: ${pedido.formaPagamento || "Nao informado"}</div>
+        ${pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 ? `<div>Troco para: R$ ${pedido.troco.toFixed(2)}</div>` : ""}
+        ${pedido.formaPagamento === "Pix" ? `<div>Chave Pix: 81997307264</div>` : ""}
+        
+        <div class="linha"></div>
+        <div class="center">Obrigado pela preferencia!</div>
+        <br>
       </body>
     </html>
   `)
@@ -286,4 +294,93 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
     await onAtualizarStatus(pedido.id, STATUS_ENUM[novoStatus], pedido);
     setCarregando(false);
   }
+
+  return (
+    <div style={{ background: isNovo ? "rgba(236,72,153,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${isNovo ? "rgba(236,72,153,0.6)" : "rgba(255,255,255,0.07)"}`, borderRadius: "18px", overflow: "hidden", transition: "all 0.3s", animation: isNovo ? "glowBorder 1s infinite" : "none" }}>
+      <div onClick={() => setExpandido(!expandido)} style={{ padding: "20px 24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(236,72,153,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>👤</div>
+          <div>
+            <div style={{ fontWeight: "bold", fontSize: "16px" }}>#{pedido.id} — {pedido.clienteNome}</div>
+            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
+              {pedido.tipoEntrega === "Retirada" ? "🏪 Retirada no balcão" : `📍 ${pedido.endereco}`}
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ background: `rgba(${status.cor},0.15)`, border: `1px solid rgba(${status.cor},0.4)`, color: `rgb(${status.cor})`, padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: "bold" }}>{status.label}</div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "18px", fontWeight: "bold", color: "#ec4899" }}>R$ {pedido.total.toFixed(2)}</div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{new Date(pedido.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "18px", transition: "transform 0.2s", transform: expandido ? "rotate(180deg)" : "rotate(0deg)" }}>▾</div>
+        </div>
+      </div>
+
+      {expandido && (
+        <div style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ paddingTop: "16px", marginBottom: "12px", fontSize: "12px", color: "rgba(255,255,255,0.3)", letterSpacing: "1px" }}>ITENS DO PEDIDO</div>
+          {pedido.itens?.map((item, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ background: "rgba(236,72,153,0.15)", color: "#ec4899", width: "24px", height: "24px", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "bold" }}>{item.quantidade}</span>
+                <span>{item.produtoNome}</span>
+              </div>
+              <span style={{ color: "rgba(255,255,255,0.5)" }}>R$ {item.subtotal.toFixed(2)}</span>
+            </div>
+          ))}
+
+          <div style={{ marginTop: "14px", marginBottom: "12px", display: "flex", justifyContent: "space-between", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
+            <span>📞 {pedido.clienteTelefone}</span>
+            <span>{pedido.tipoEntrega === "Retirada" ? "🏪 Retirada no balcão" : "🛵 Taxa de entrega: R$ 5,00"}</span>
+          </div>
+
+          {pedido.formaPagamento && (
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px" }}>
+              <span style={{ fontSize: "18px" }}>{pagamentoIcon[pedido.formaPagamento] || "💳"}</span>
+              <span style={{ color: "rgba(255,255,255,0.7)" }}>
+                {pedido.formaPagamento}
+                {pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 && ` — Troco para R$ ${pedido.troco.toFixed(2)}`}
+                {pedido.formaPagamento === "Pix" && " — Chave: 81997307264"}
+              </span>
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            {pedido.status === "Pendente" && (
+              <>
+                <BotaoAcao label={carregando ? "Aguarde..." : "🔴 Iniciar Preparo"} cor="236,72,153" onClick={() => handleStatus("EmPreparo")} disabled={carregando} />
+                <BotaoAcao label="⚫ Cancelar" cor="239,68,68" outline onClick={() => handleStatus("Cancelado")} disabled={carregando} />
+              </>
+            )}
+            {pedido.status === "EmPreparo" && (
+              <BotaoAcao label={carregando ? "Aguarde..." : "🟣 Pedido Pronto"} cor="168,85,247" onClick={() => handleStatus("Pronto")} disabled={carregando} />
+            )}
+            {pedido.status === "Pronto" && (
+              <BotaoAcao label={carregando ? "Aguarde..." : "🟢 Finalizar Pedido"} cor="34,197,94" onClick={() => handleStatus("Entregue")} disabled={carregando} />
+            )}
+            {pedido.status === "Entregue" && (
+              <div style={{ fontSize: "13px", color: "rgba(34,197,94,0.7)", padding: "8px 0" }}>✅ Pedido finalizado e entregue</div>
+            )}
+            {pedido.status === "Cancelado" && (
+              <div style={{ fontSize: "13px", color: "rgba(239,68,68,0.7)", padding: "8px 0" }}>❌ Pedido cancelado</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BotaoAcao({ label, cor, onClick, disabled, outline }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button onClick={onClick} disabled={disabled} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      style={{ padding: "10px 20px", borderRadius: "10px", cursor: disabled ? "not-allowed" : "pointer", fontFamily: "Georgia, serif", fontSize: "13px", fontWeight: "bold", transition: "all 0.2s", background: outline ? hovered ? `rgba(${cor},0.15)` : "transparent" : hovered ? `rgba(${cor},0.8)` : `rgba(${cor},0.2)`, border: `1px solid rgba(${cor},0.5)`, color: `rgb(${cor})`, boxShadow: hovered && !outline ? `0 4px 15px rgba(${cor},0.3)` : "none", opacity: disabled ? 0.6 : 1 }}>
+      {label}
+    </button>
+  );
+}
+
+export default Pedidos;
 
