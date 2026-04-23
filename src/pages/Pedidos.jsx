@@ -13,6 +13,85 @@ const STATUS_ENUM = {
   Cancelado: 5
 };
 
+function imprimirPedido(pedido) {
+  const sep = "********************************";
+  const linha = "--------------------------------";
+  const pontilhado = "................................";
+
+  let texto = `${sep}\n`;
+  texto += `       DELICIAS DA MILA\n`;
+  texto += `${sep}\n\n`;
+  texto += pedido.tipoEntrega === "Retirada"
+    ? `       RETIRADA NO LOCAL\n`
+    : `           DELIVERY\n`;
+  texto += `${pontilhado}\n`;
+  texto += `Cliente: ${pedido.clienteNome}\n`;
+  texto += `Tel: ${pedido.clienteTelefone}\n`;
+  if (pedido.tipoEntrega !== "Retirada") texto += `End: ${pedido.endereco}\n`;
+  texto += `Data: ${new Date(pedido.criadoEm).toLocaleString("pt-BR")}\n`;
+  texto += `Pedido #${pedido.id}\n`;
+  texto += `${pontilhado}\n\n`;
+  texto += `Itens\n`;
+  texto += `${linha}\n`;
+
+  pedido.itens?.forEach(item => {
+    texto += `(${item.quantidade}) ${item.produtoNome}\n`;
+    texto += `   R$ ${item.precoUnitario.toFixed(2)} x ${item.quantidade} = R$ ${item.subtotal.toFixed(2)}\n`;
+  });
+
+  texto += `${linha}\n`;
+  if (pedido.tipoEntrega !== "Retirada")
+    texto += `Taxa de entrega:        R$ 5,00\n`;
+  else
+    texto += `Retirada no local:      Gratis\n`;
+  texto += `${linha}\n`;
+  texto += `Total:                 R$ ${pedido.total.toFixed(2)}\n`;
+  texto += `${pontilhado}\n`;
+  texto += `Pagamento: ${pedido.formaPagamento || "Não informado"}\n`;
+  if (pedido.formaPagamento === "Dinheiro" && pedido.troco > 0)
+    texto += `Troco para: R$ ${pedido.troco.toFixed(2)}\n`;
+  if (pedido.formaPagamento === "Pix")
+    texto += `Chave Pix: 81997307264\n`;
+  texto += `${sep}\n`;
+  texto += `  Agradecemos pela preferencia!\n`;
+  texto += `${sep}\n`;
+
+  // Abre janela de impressão
+  const janela = window.open("", "_blank", "width=400,height=600")
+  janela.document.write(`
+    <html>
+      <head>
+        <title>Pedido #${pedido.id} - Delícias da Mila</title>
+        <style>
+          body {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 0;
+            padding: 10px;
+            white-space: pre;
+          }
+          @media print {
+            body { margin: 0; padding: 0; }
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <button onclick="window.print();window.close();" style="width:100%;padding:10px;margin-bottom:10px;background:#ec4899;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">
+          🖨️ Imprimir
+        </button>
+        ${texto.replace(/\n/g, '<br>')}
+      </body>
+    </html>
+  `)
+  janela.document.close()
+  janela.focus()
+  // Tenta imprimir automaticamente
+  setTimeout(() => {
+    janela.print()
+  }, 500)
+}
+
 function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [novoPedido, setNovoPedido] = useState(false);
@@ -56,14 +135,20 @@ function Pedidos() {
     }
   };
 
-  const atualizarStatus = async (id, status) => {
+  const atualizarStatus = async (id, status, pedido) => {
     try {
       const res = await fetch(`${API_URL}/Pedidos/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
-      if (res.ok) await buscarPedidos();
+      if (res.ok) {
+        // Imprime quando iniciar preparo
+        if (status === STATUS_ENUM.EmPreparo && pedido) {
+          imprimirPedido(pedido)
+        }
+        await buscarPedidos();
+      }
     } catch (error) {
       console.error("Erro ao atualizar status", error);
     }
@@ -177,15 +262,11 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
   };
   const status = statusMap[pedido.status] || { cor: "249,115,22", label: pedido.status };
 
-  const pagamentoIcon = {
-    "Dinheiro": "💵",
-    "Pix": "🔑",
-    "Cartão": "💳"
-  };
+  const pagamentoIcon = { "Dinheiro": "💵", "Pix": "🔑", "Cartão": "💳" };
 
   async function handleStatus(novoStatus) {
     setCarregando(true);
-    await onAtualizarStatus(pedido.id, STATUS_ENUM[novoStatus]);
+    await onAtualizarStatus(pedido.id, STATUS_ENUM[novoStatus], pedido);
     setCarregando(false);
   }
 
@@ -229,7 +310,6 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
             <span>{pedido.tipoEntrega === "Retirada" ? "🏪 Retirada no balcão" : "🛵 Taxa de entrega: R$ 5,00"}</span>
           </div>
 
-          {/* Pagamento */}
           {pedido.formaPagamento && (
             <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px" }}>
               <span style={{ fontSize: "18px" }}>{pagamentoIcon[pedido.formaPagamento] || "💳"}</span>
