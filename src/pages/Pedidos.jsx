@@ -34,7 +34,7 @@ function imprimirPedido(pedido) {
             font-weight: bold;
             color: #000;
             background: #fff;
-            width: 48mm;
+            width: 44mm;
             padding: 1mm;
           }
           .center { text-align: center; }
@@ -46,8 +46,8 @@ function imprimirPedido(pedido) {
           .btn { display:block; width:100%; padding:6px; margin-bottom:6px; background:#ec4899; color:white; border:none; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
           @media print {
             .btn { display: none; }
-            body { width: 48mm; padding: 0; }
-            @page { size: 210mm 58mm landscape; margin: 0; }
+            body { width: 44mm; padding: 0; }
+            @page { size: 210mm 55mm landscape; margin: 0; }
           }
         </style>
       </head>
