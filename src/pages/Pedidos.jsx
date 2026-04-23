@@ -47,7 +47,7 @@ function imprimirPedido(pedido) {
           @media print {
             .btn { display: none; }
             body { width: 48mm; padding: 0; }
-            @page { size: 58mm auto; margin: 0mm 3mm; }
+            @page { size: 210mm 58mm landscape; margin: 0; }
           }
         </style>
       </head>
