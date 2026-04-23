@@ -10,7 +10,7 @@ export default function Cardapio() {
   const [carrinho, setCarrinho] = useState([])
   const [showCarrinho, setShowCarrinho] = useState(false)
   const [showFormPedido, setShowFormPedido] = useState(false)
-  const [pedidoConfirmado, setPedidoConfirmado] = useState(null) // { tempoEspera, previsao }
+  const [pedidoConfirmado, setPedidoConfirmado] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [tipoEntrega, setTipoEntrega] = useState('Entrega')
   const [formaPagamento, setFormaPagamento] = useState('')
@@ -96,7 +96,6 @@ export default function Cardapio() {
       setFormaPagamento('')
       setTroco('')
 
-      // Mostrar tela de confirmação com tempo
       setPedidoConfirmado({
         tempoEspera: response.data.tempoEspera,
         previsao: response.data.previsao,
@@ -118,57 +117,28 @@ export default function Cardapio() {
     </div>
   )
 
-  // Tela de confirmação do pedido
+  // Tela de confirmação
   if (pedidoConfirmado) return (
-    <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
-      <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-      <div style={{ fontSize: '80px', marginBottom: '24px', animation: 'bounce 1s ease' }}>✅</div>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px', background: 'linear-gradient(135deg, #fff, #f9a8d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+    <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
+      <div style={{ fontSize: '72px', marginBottom: '20px', animation: 'bounce 1s ease' }}>✅</div>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', background: 'linear-gradient(135deg, #fff, #f9a8d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
         Pedido #{pedidoConfirmado.pedidoId} enviado!
       </h1>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '40px' }}>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '32px' }}>
         A Mila já recebeu seu pedido 🎉
       </p>
-
-      {/* Card de tempo */}
-      <div style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(236,72,153,0.3)',
-        borderRadius: '20px',
-        padding: '32px 48px',
-        marginBottom: '32px',
-        maxWidth: '340px',
-        width: '100%'
-      }}>
-        <div style={{ fontSize: '48px', marginBottom: '12px' }}>⏱️</div>
-        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>
-          TEMPO ESTIMADO
-        </div>
-        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#ec4899', marginBottom: '8px' }}>
-          {pedidoConfirmado.tempoEspera} min
-        </div>
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '20px', padding: '28px 32px', marginBottom: '28px', width: '100%', maxWidth: '320px', boxSizing: 'border-box' }}>
+        <div style={{ fontSize: '40px', marginBottom: '10px' }}>⏱️</div>
+        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>TEMPO ESTIMADO</div>
+        <div style={{ fontSize: '44px', fontWeight: 'bold', color: '#ec4899', marginBottom: '8px' }}>{pedidoConfirmado.tempoEspera} min</div>
         <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
           Previsão: até às <strong style={{ color: '#fff' }}>{pedidoConfirmado.previsao}</strong>
         </div>
       </div>
-
-      <button
-        onClick={() => setPedidoConfirmado(null)}
-        style={{
-          background: 'linear-gradient(135deg, #ec4899, #be185d)',
-          border: 'none', color: '#fff', padding: '14px 40px',
-          borderRadius: '12px', fontSize: '15px', fontWeight: 'bold',
-          cursor: 'pointer', fontFamily: 'Georgia, serif',
-          boxShadow: '0 4px 20px rgba(236,72,153,0.4)'
-        }}
-      >
+      <button onClick={() => setPedidoConfirmado(null)} style={{ background: 'linear-gradient(135deg, #ec4899, #be185d)', border: 'none', color: '#fff', padding: '14px 40px', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif', boxShadow: '0 4px 20px rgba(236,72,153,0.4)', width: '100%', maxWidth: '320px' }}>
         Voltar ao cardápio
       </button>
-
-      <style>{`
-        @keyframes bounce { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
-      `}</style>
+      <style>{`@keyframes bounce { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }`}</style>
     </div>
   )
 
@@ -177,34 +147,38 @@ export default function Cardapio() {
       <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'fixed', bottom: '-100px', left: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15,15,15,0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <img src={logo} alt="Delícias da Mila" style={{ width: '52px', height: '52px', borderRadius: '14px', objectFit: 'cover', objectPosition: 'top', border: '2px solid rgba(236,72,153,0.5)', boxShadow: '0 4px 20px rgba(236,72,153,0.3)' }} />
+      {/* Header */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15,15,15,0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src={logo} alt="Delícias da Mila" style={{ width: '44px', height: '44px', borderRadius: '12px', objectFit: 'cover', objectPosition: 'top', border: '2px solid rgba(236,72,153,0.5)', boxShadow: '0 4px 20px rgba(236,72,153,0.3)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: '22px', fontWeight: 'bold', background: 'linear-gradient(135deg, #fff, #f9a8d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.5px' }}>Delícias da Mila</div>
-            <div style={{ fontSize: '11px', color: '#ec4899', letterSpacing: '3px', textTransform: 'uppercase' }}>Cardápio</div>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', background: 'linear-gradient(135deg, #fff, #f9a8d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Delícias da Mila</div>
+            <div style={{ fontSize: '10px', color: '#ec4899', letterSpacing: '2px', textTransform: 'uppercase' }}>Cardápio</div>
           </div>
         </div>
-        <button onClick={() => setShowCarrinho(true)} style={{ background: totalItens > 0 ? 'linear-gradient(135deg, #ec4899, #be185d)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(236,72,153,0.4)', color: '#fff', padding: '10px 20px', borderRadius: '12px', fontSize: '15px', cursor: 'pointer', fontFamily: 'Georgia, serif', transition: 'all 0.2s', boxShadow: totalItens > 0 ? '0 4px 15px rgba(236,72,153,0.4)' : 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button onClick={() => setShowCarrinho(true)} style={{ background: totalItens > 0 ? 'linear-gradient(135deg, #ec4899, #be185d)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(236,72,153,0.4)', color: '#fff', padding: '8px 14px', borderRadius: '12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Georgia, serif', transition: 'all 0.2s', boxShadow: totalItens > 0 ? '0 4px 15px rgba(236,72,153,0.4)' : 'none', display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
           🛒
-          {totalItens > 0 && <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{totalItens} • R$ {totalFinal.toFixed(2)}</span>}
-          {totalItens === 0 && <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>Carrinho</span>}
+          {totalItens > 0 && <span style={{ fontWeight: 'bold', fontSize: '13px' }}>{totalItens} • R$ {totalFinal.toFixed(2)}</span>}
+          {totalItens === 0 && <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Carrinho</span>}
         </button>
       </header>
 
-      <div style={{ display: 'flex', gap: '10px', padding: '20px 32px', overflowX: 'auto', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)', scrollbarWidth: 'none' }}>
+      {/* Categorias */}
+      <div style={{ display: 'flex', gap: '8px', padding: '14px 16px', overflowX: 'auto', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
         <CatBtn label="Todos" active={!categoriaSelecionada} onClick={() => setCategoriaSelecionada(null)} />
         {categorias.map(cat => (
           <CatBtn key={cat.id} label={cat.nome} active={categoriaSelecionada === cat.nome} onClick={() => setCategoriaSelecionada(cat.nome)} />
         ))}
       </div>
 
-      <div style={{ padding: '24px 32px 8px', color: 'rgba(255,255,255,0.3)', fontSize: '13px', letterSpacing: '1px' }}>
+      {/* Contagem */}
+      <div style={{ padding: '16px 16px 8px', color: 'rgba(255,255,255,0.3)', fontSize: '12px', letterSpacing: '1px' }}>
         {produtosFiltrados.length} {produtosFiltrados.length === 1 ? 'ITEM' : 'ITENS'}
         {categoriaSelecionada ? ` EM ${categoriaSelecionada.toUpperCase()}` : ' NO CARDÁPIO'}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', padding: '16px 32px 120px' }}>
+      {/* Grid de Produtos */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', padding: '8px 16px 100px' }}>
         {produtosFiltrados.map(produto => (
           <ProdutoCard key={produto.id} produto={produto} onAdicionar={() => adicionarAoCarrinho(produto)} quantidadeNoCarrinho={carrinho.find(i => i.id === produto.id)?.quantidade || 0} />
         ))}
@@ -214,19 +188,25 @@ export default function Cardapio() {
         DELÍCIAS DA MILA © {new Date().getFullYear()} — FEITO COM ❤️
       </div>
 
+      {/* Drawer do Carrinho - TOTALMENTE RESPONSIVO */}
       {showCarrinho && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
           <div onClick={() => { setShowCarrinho(false); setShowFormPedido(false) }} style={{ flex: 1, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} />
-          <div style={{ width: '420px', maxWidth: '100vw', background: '#141414', borderLeft: '1px solid rgba(236,72,153,0.2)', display: 'flex', flexDirection: 'column', animation: 'slideLeft 0.3s ease' }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+          {/* Painel - ocupa 100% em mobile */}
+          <div style={{ width: 'min(420px, 100vw)', background: '#141414', borderLeft: '1px solid rgba(236,72,153,0.2)', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', animation: 'slideLeft 0.3s ease' }}>
+
+            {/* Header carrinho */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <div>
-                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>🛒 Seu Carrinho</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>🛒 Seu Carrinho</div>
                 <div style={{ fontSize: '12px', color: '#ec4899', marginTop: '2px' }}>{totalItens} {totalItens === 1 ? 'item' : 'itens'}</div>
               </div>
-              <button onClick={() => { setShowCarrinho(false); setShowFormPedido(false) }} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px' }}>✕</button>
+              <button onClick={() => { setShowCarrinho(false); setShowFormPedido(false) }} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>✕</button>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px' }}>
+            {/* Itens - scroll independente */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px', WebkitOverflowScrolling: 'touch' }}>
               {carrinho.length === 0 ? (
                 <div style={{ textAlign: 'center', marginTop: '60px', color: 'rgba(255,255,255,0.3)' }}>
                   <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛒</div>
@@ -234,54 +214,59 @@ export default function Cardapio() {
                 </div>
               ) : (
                 carrinho.map(item => (
-                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <img src={item.imagemUrl} alt={item.nome} style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'cover' }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{item.nome}</div>
-                      <div style={{ color: '#ec4899', fontSize: '14px', marginTop: '2px' }}>R$ {(item.preco * item.quantidade).toFixed(2)}</div>
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <img src={item.imagemUrl} alt={item.nome} style={{ width: '50px', height: '50px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 'bold', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.nome}</div>
+                      <div style={{ color: '#ec4899', fontSize: '13px', marginTop: '2px' }}>R$ {(item.preco * item.quantidade).toFixed(2)}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button onClick={() => removerDoCarrinho(item.id)} style={{ width: '28px', height: '28px', borderRadius: '8px', border: '1px solid rgba(236,72,153,0.3)', background: 'transparent', color: '#ec4899', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                      <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{item.quantidade}</span>
-                      <button onClick={() => adicionarAoCarrinho(item)} style={{ width: '28px', height: '28px', borderRadius: '8px', border: '1px solid rgba(236,72,153,0.3)', background: 'rgba(236,72,153,0.1)', color: '#ec4899', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                      <button onClick={() => removerTudo(item.id)} style={{ width: '28px', height: '28px', borderRadius: '8px', border: 'none', background: 'transparent', color: 'rgba(239,68,68,0.5)', cursor: 'pointer', fontSize: '14px' }}>🗑️</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                      <button onClick={() => removerDoCarrinho(item.id)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid rgba(236,72,153,0.3)', background: 'transparent', color: '#ec4899', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                      <span style={{ fontWeight: 'bold', minWidth: '18px', textAlign: 'center', fontSize: '14px' }}>{item.quantidade}</span>
+                      <button onClick={() => adicionarAoCarrinho(item)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid rgba(236,72,153,0.3)', background: 'rgba(236,72,153,0.1)', color: '#ec4899', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                      <button onClick={() => removerTudo(item.id)} style={{ width: '30px', height: '30px', borderRadius: '8px', border: 'none', background: 'transparent', color: 'rgba(239,68,68,0.5)', cursor: 'pointer', fontSize: '14px' }}>🗑️</button>
                     </div>
                   </div>
                 ))
               )}
             </div>
 
+            {/* Rodapé fixo com botão sempre visível */}
             {carrinho.length > 0 && (
-              <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginBottom: '10px' }}>COMO DESEJA RECEBER?</div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0, background: '#141414' }}>
+
+                {/* Tipo de entrega */}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginBottom: '8px' }}>COMO DESEJA RECEBER?</div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     <TipoBtn label="🛵 Entrega" active={tipoEntrega === 'Entrega'} onClick={() => setTipoEntrega('Entrega')} />
-                    <TipoBtn label="🏪 Retirada no balcão" active={tipoEntrega === 'Retirada'} onClick={() => setTipoEntrega('Retirada')} />
+                    <TipoBtn label="🏪 Retirada" active={tipoEntrega === 'Retirada'} onClick={() => setTipoEntrega('Retirada')} />
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>
+                {/* Totais */}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
                     <span>Subtotal</span><span>R$ {totalPreco.toFixed(2)}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
                     <span style={{ color: tipoEntrega === 'Retirada' ? '#22c55e' : 'rgba(255,255,255,0.5)' }}>
-                      {tipoEntrega === 'Retirada' ? '✅ Sem taxa de entrega' : 'Taxa de entrega'}
+                      {tipoEntrega === 'Retirada' ? '✅ Sem taxa' : 'Taxa de entrega'}
                     </span>
                     <span style={{ color: tipoEntrega === 'Retirada' ? '#22c55e' : 'rgba(255,255,255,0.5)' }}>
                       {tipoEntrega === 'Retirada' ? 'Grátis' : 'R$ 5,00'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 'bold' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '17px', fontWeight: 'bold' }}>
                     <span>Total</span>
                     <span style={{ color: '#ec4899' }}>R$ {totalFinal.toFixed(2)}</span>
                   </div>
                 </div>
 
+                {/* Formulário */}
                 {showFormPedido && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
-                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
                     <FormInput placeholder="Seu nome" value={form.clienteNome} onChange={e => setForm({ ...form, clienteNome: e.target.value })} />
                     <FormInput placeholder="Telefone (WhatsApp)" value={form.clienteTelefone} onChange={e => setForm({ ...form, clienteTelefone: e.target.value })} />
                     {tipoEntrega === 'Entrega' && (
@@ -293,17 +278,17 @@ export default function Cardapio() {
                       </div>
                     )}
 
-                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginTop: '6px' }}>FORMA DE PAGAMENTO</div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginTop: '4px' }}>FORMA DE PAGAMENTO</div>
+                    <div style={{ display: 'flex', gap: '6px' }}>
                       {['Dinheiro', 'Pix', 'Cartão'].map(op => (
                         <button key={op} onClick={() => setFormaPagamento(op)} style={{
-                          flex: 1, minWidth: '80px', padding: '10px 8px', borderRadius: '10px', cursor: 'pointer',
+                          flex: 1, padding: '8px 4px', borderRadius: '10px', cursor: 'pointer',
                           border: formaPagamento === op ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)',
                           background: formaPagamento === op ? 'rgba(236,72,153,0.15)' : 'transparent',
                           color: formaPagamento === op ? '#ec4899' : 'rgba(255,255,255,0.4)',
-                          fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif', transition: 'all 0.2s'
+                          fontSize: '12px', fontWeight: 'bold', fontFamily: 'Georgia, serif', transition: 'all 0.2s'
                         }}>
-                          {op === 'Dinheiro' ? '💵 Dinheiro' : op === 'Pix' ? '🔑 Pix' : '💳 Cartão'}
+                          {op === 'Dinheiro' ? '💵' : op === 'Pix' ? '🔑' : '💳'} {op}
                         </button>
                       ))}
                     </div>
@@ -313,27 +298,27 @@ export default function Cardapio() {
                     )}
 
                     {formaPagamento === 'Pix' && (
-                      <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '10px', padding: '12px 14px' }}>
-                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>CHAVE PIX</div>
+                      <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '10px', padding: '10px 14px' }}>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '2px' }}>CHAVE PIX</div>
                         <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#ec4899' }}>81997307264</div>
-                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>Envie o comprovante pelo WhatsApp</div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>Envie o comprovante pelo WhatsApp</div>
                       </div>
                     )}
 
-                    {/* Aviso de tempo */}
-                    <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', color: '#f97316', textAlign: 'center' }}>
-                      ⏱️ Tempo estimado de espera: <strong>30 minutos</strong>
+                    <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', padding: '8px 14px', fontSize: '12px', color: '#f97316', textAlign: 'center' }}>
+                      ⏱️ Tempo estimado: <strong>30 minutos</strong>
                     </div>
                   </div>
                 )}
 
+                {/* Botão sempre visível */}
                 {!showFormPedido ? (
                   <button onClick={() => setShowFormPedido(true)} style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #ec4899, #be185d)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif', boxShadow: '0 4px 15px rgba(236,72,153,0.4)' }}>
                     Continuar →
                   </button>
                 ) : (
                   <button onClick={handleFinalizarPedido} disabled={enviando} style={{ width: '100%', padding: '14px', background: enviando ? 'rgba(34,197,94,0.3)' : 'linear-gradient(135deg, #22c55e, #16a34a)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer', fontFamily: 'Georgia, serif', boxShadow: enviando ? 'none' : '0 4px 15px rgba(34,197,94,0.4)' }}>
-                    {enviando ? 'Enviando pedido...' : '✅ Finalizar Pedido'}
+                    {enviando ? 'Enviando...' : '✅ Finalizar Pedido'}
                   </button>
                 )}
               </div>
@@ -345,6 +330,8 @@ export default function Cardapio() {
       <style>{`
         @keyframes slideLeft { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @keyframes slideDown { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        * { -webkit-tap-highlight-color: transparent; }
+        input { font-size: 16px !important; }
       `}</style>
     </div>
   )
@@ -352,29 +339,26 @@ export default function Cardapio() {
 
 function TipoBtn({ label, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: active ? 'rgba(236,72,153,0.15)' : 'transparent', color: active ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif', transition: 'all 0.2s' }}>
+    <button onClick={onClick} style={{ flex: 1, padding: '10px 6px', borderRadius: '10px', cursor: 'pointer', border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: active ? 'rgba(236,72,153,0.15)' : 'transparent', color: active ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '12px', fontWeight: 'bold', fontFamily: 'Georgia, serif', transition: 'all 0.2s' }}>
       {label}
     </button>
   )
 }
 
 function CatBtn({ label, active, onClick }) {
-  const [hovered, setHovered] = useState(false)
   return (
-    <button onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ padding: '8px 20px', borderRadius: '30px', border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: active ? 'linear-gradient(135deg, #ec4899, #be185d)' : hovered ? 'rgba(236,72,153,0.1)' : 'rgba(255,255,255,0.03)', color: active ? '#fff' : hovered ? '#ec4899' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', fontFamily: 'Georgia, serif', letterSpacing: '0.5px', boxShadow: active ? '0 4px 15px rgba(236,72,153,0.3)' : 'none' }}>
+    <button onClick={onClick}
+      style={{ padding: '7px 16px', borderRadius: '30px', border: active ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: active ? 'linear-gradient(135deg, #ec4899, #be185d)' : 'rgba(255,255,255,0.03)', color: active ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Georgia, serif', boxShadow: active ? '0 4px 15px rgba(236,72,153,0.3)' : 'none', flexShrink: 0 }}>
       {label}
     </button>
   )
 }
 
 function ProdutoCard({ produto, onAdicionar, quantidadeNoCarrinho }) {
-  const [hovered, setHovered] = useState(false)
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ background: hovered ? 'rgba(236,72,153,0.06)' : 'rgba(255,255,255,0.03)', border: `1px solid ${hovered ? 'rgba(236,72,153,0.4)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease', transform: hovered ? 'translateY(-4px)' : 'translateY(0)', boxShadow: hovered ? '0 20px 40px rgba(236,72,153,0.15)' : 'none' }}>
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', overflow: 'hidden' }}>
       <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
-        <img src={produto.imagemUrl} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease', transform: hovered ? 'scale(1.06)' : 'scale(1)' }} />
+        <img src={produto.imagemUrl} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15,15,15,0.8)', border: '1px solid rgba(236,72,153,0.4)', color: '#ec4899', fontSize: '10px', padding: '3px 10px', borderRadius: '20px', letterSpacing: '1px', backdropFilter: 'blur(6px)' }}>
           {produto.categoriaNome?.toUpperCase()}
         </div>
@@ -384,15 +368,12 @@ function ProdutoCard({ produto, onAdicionar, quantidadeNoCarrinho }) {
           </div>
         )}
       </div>
-      <div style={{ padding: '20px' }}>
-        <h3 style={{ fontSize: '17px', fontWeight: 'bold', margin: '0 0 6px', color: '#fff' }}>{produto.nome}</h3>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: '0 0 16px', lineHeight: '1.5' }}>{produto.descricao}</p>
+      <div style={{ padding: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 6px', color: '#fff' }}>{produto.nome}</h3>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: '0 0 14px', lineHeight: '1.5' }}>{produto.descricao}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#ec4899' }}>R$ {produto.preco.toFixed(2)}</span>
-          <button onClick={onAdicionar}
-            onMouseEnter={e => { e.target.style.background = 'linear-gradient(135deg, #ec4899, #be185d)'; e.target.style.color = '#fff' }}
-            onMouseLeave={e => { e.target.style.background = 'rgba(236,72,153,0.15)'; e.target.style.color = '#ec4899' }}
-            style={{ background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.5)', color: '#ec4899', padding: '8px 18px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Georgia, serif' }}>
+          <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#ec4899' }}>R$ {produto.preco.toFixed(2)}</span>
+          <button onClick={onAdicionar} style={{ background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.5)', color: '#ec4899', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
             + Adicionar
           </button>
         </div>
@@ -404,7 +385,7 @@ function ProdutoCard({ produto, onAdicionar, quantidadeNoCarrinho }) {
 function FormInput({ placeholder, value, onChange }) {
   return (
     <input placeholder={placeholder} value={value} onChange={onChange}
-      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', fontFamily: 'Georgia, serif', outline: 'none' }}
+      style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '11px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
       onFocus={e => e.target.style.borderColor = 'rgba(236,72,153,0.5)'}
       onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
     />
