@@ -14,15 +14,15 @@ const STATUS_ENUM = {
 };
 
 function imprimirPedido(pedido) {
-  const janela = window.open("", "_blank", "width=300,height=500")
-  
+  const janela = window.open("", "_blank", "width=250,height=500")
+
   let itensHtml = ""
   pedido.itens?.forEach(item => {
     itensHtml += `
-      <tr>
-        <td>${item.quantidade}x ${item.produtoNome}</td>
-        <td style="text-align:right">R$ ${item.subtotal.toFixed(2)}</td>
-      </tr>
+      <div class="item-row">
+        <span>${item.quantidade}x ${item.produtoNome}</span>
+        <span>R$${item.subtotal.toFixed(2)}</span>
+      </div>
     `
   })
 
@@ -34,38 +34,57 @@ function imprimirPedido(pedido) {
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: bold;
             color: #000;
             background: #fff;
-            width: 58mm;
-            padding: 2mm;
+            width: 52mm;
+            padding: 1mm 2mm;
           }
           .center { text-align: center; }
-          .bold { font-weight: 900; }
-          .linha { border-top: 1px dashed #000; margin: 4px 0; }
-          table { width: 100%; border-collapse: collapse; }
-          td { font-size: 11px; font-weight: bold; padding: 1px 0; }
-          .total { font-size: 13px; font-weight: 900; }
+          .bold { font-weight: 900; font-size: 10px; }
+          .linha { border-top: 1px dashed #000; margin: 3px 0; }
+          .item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 1px 0;
+            word-break: break-word;
+          }
+          .item-row span:first-child {
+            flex: 1;
+            margin-right: 4px;
+          }
+          .item-row span:last-child {
+            white-space: nowrap;
+          }
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 0;
+          }
           .btn {
             display: block;
             width: 100%;
-            padding: 8px;
-            margin-bottom: 8px;
+            padding: 6px;
+            margin-bottom: 6px;
             background: #ec4899;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
           }
           @media print {
             .btn { display: none; }
-            body { 
-              width: 58mm;
+            body {
+              width: 52mm;
               margin: 0;
-              padding: 1mm;
+              padding: 0 1mm;
             }
             @page {
               size: 58mm auto;
@@ -76,40 +95,40 @@ function imprimirPedido(pedido) {
       </head>
       <body>
         <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
-        
+
         <div class="center bold">DELICIAS DA MILA</div>
         <div class="center">${pedido.tipoEntrega === "Retirada" ? "RETIRADA NO LOCAL" : "DELIVERY"}</div>
         <div class="linha"></div>
-        
+
         <div>Pedido: #${pedido.id}</div>
         <div>Cliente: ${pedido.clienteNome}</div>
         <div>Tel: ${pedido.clienteTelefone}</div>
         ${pedido.tipoEntrega !== "Retirada" ? `<div>End: ${pedido.endereco}</div>` : ""}
         <div>Data: ${new Date(pedido.criadoEm).toLocaleString("pt-BR")}</div>
-        
+
         <div class="linha"></div>
         <div class="bold">ITENS:</div>
-        <table>
-          ${itensHtml}
-        </table>
+        ${itensHtml}
         <div class="linha"></div>
-        
-        ${pedido.tipoEntrega !== "Retirada" ? `<table><tr><td>Taxa entrega</td><td style="text-align:right">R$ 5,00</td></tr></table>` : ""}
-        
-        <table>
-          <tr>
-            <td class="total bold">TOTAL</td>
-            <td class="total bold" style="text-align:right">R$ ${pedido.total.toFixed(2)}</td>
-          </tr>
-        </table>
-        
+
+        ${pedido.tipoEntrega !== "Retirada" ? `
+        <div class="item-row">
+          <span>Taxa entrega</span>
+          <span>R$5,00</span>
+        </div>` : ""}
+
+        <div class="total-row">
+          <span>TOTAL</span>
+          <span>R$${pedido.total.toFixed(2)}</span>
+        </div>
+
         <div class="linha"></div>
-        <div>Pagamento: ${pedido.formaPagamento || "Nao informado"}</div>
-        ${pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 ? `<div>Troco para: R$ ${pedido.troco.toFixed(2)}</div>` : ""}
-        ${pedido.formaPagamento === "Pix" ? `<div>Chave Pix: 81997307264</div>` : ""}
-        
+        <div>Pgto: ${pedido.formaPagamento || "Nao informado"}</div>
+        ${pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 ? `<div>Troco: R$${pedido.troco.toFixed(2)}</div>` : ""}
+        ${pedido.formaPagamento === "Pix" ? `<div>Pix: 81997307264</div>` : ""}
+
         <div class="linha"></div>
-        <div class="center">Obrigado pela preferencia!</div>
+        <div class="center">Obrigado!</div>
         <br>
       </body>
     </html>
@@ -383,4 +402,3 @@ function BotaoAcao({ label, cor, onClick, disabled, outline }) {
 }
 
 export default Pedidos;
-
