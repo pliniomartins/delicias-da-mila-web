@@ -13,19 +13,74 @@ const STATUS_ENUM = {
   Cancelado: 5
 };
 
-function imprimirPedido(pedido) {
-  const janela = window.open("", "_blank", "width=250,height=500")
+function pad(str, len) {
+  str = String(str)
+  if (str.length >= len) return str.substring(0, len)
+  return str + ' '.repeat(len - str.length)
+}
 
-  let itensHtml = ""
+function imprimirPedido(pedido) {
+  const W = 32 // largura em caracteres para 58mm
+
+  const centro = (txt) => {
+    const spaces = Math.max(0, Math.floor((W - txt.length) / 2))
+    return ' '.repeat(spaces) + txt
+  }
+
+  const linha = (esq, dir) => {
+    const espaco = W - esq.length - dir.length
+    if (espaco <= 0) return esq + ' ' + dir
+    return esq + ' '.repeat(espaco) + dir
+  }
+
+  const sep = '.' .repeat(W)
+  const sep2 = '-'.repeat(W)
+
+  let linhas = []
+  linhas.push(centro('DELICIAS DA MILA'))
+  linhas.push(sep)
+  linhas.push(centro(pedido.tipoEntrega === 'Retirada' ? 'RETIRADA NO LOCAL' : 'DELIVERY'))
+  linhas.push(sep)
+  linhas.push(`Cliente: ${pedido.clienteNome}`)
+  linhas.push(`Tel: ${pedido.clienteTelefone}`)
+  if (pedido.tipoEntrega !== 'Retirada') linhas.push(`End: ${pedido.endereco}`)
+  linhas.push(`Data: ${new Date(pedido.criadoEm).toLocaleString('pt-BR')}`)
+  linhas.push(`Pedido #${pedido.id}`)
+  linhas.push(sep)
+  linhas.push('')
+  linhas.push(linha('Itens', 'R$'))
+  linhas.push(sep2)
+
   pedido.itens?.forEach(item => {
-    itensHtml += `
-      <div class="item-row">
-        <span>${item.quantidade}x ${item.produtoNome}</span>
-        <span>R$${item.subtotal.toFixed(2)}</span>
-      </div>
-    `
+    const preco = `R$${item.subtotal.toFixed(2)}`
+    const nome = `(${item.quantidade}) ${item.produtoNome}`
+    linhas.push(linha(nome, preco))
   })
 
+  linhas.push(sep2)
+
+  if (pedido.tipoEntrega !== 'Retirada') {
+    linhas.push(linha('Taxa entrega', 'R$5,00'))
+  } else {
+    linhas.push(linha('Retirada no local', 'Gratis'))
+  }
+
+  linhas.push(sep2)
+  linhas.push(linha('TOTAL', `R$${pedido.total.toFixed(2)}`))
+  linhas.push(sep)
+  linhas.push(`Pgto: ${pedido.formaPagamento || 'Nao informado'}`)
+  if (pedido.formaPagamento === 'Dinheiro' && pedido.troco > 0)
+    linhas.push(`Troco: R$${pedido.troco.toFixed(2)}`)
+  if (pedido.formaPagamento === 'Pix')
+    linhas.push(`Pix: 81997307264`)
+  linhas.push(sep)
+  linhas.push(centro('Obrigado pela preferencia!'))
+  linhas.push('')
+  linhas.push('')
+
+  const conteudo = linhas.join('\n')
+
+  const janela = window.open('', '_blank', 'width=300,height=600')
   janela.document.write(`
     <html>
       <head>
@@ -34,103 +89,44 @@ function imprimirPedido(pedido) {
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             color: #000;
             background: #fff;
-            width: 52mm;
-            padding: 1mm 2mm;
-          }
-          .center { text-align: center; }
-          .bold { font-weight: 900; font-size: 10px; }
-          .linha { border-top: 1px dashed #000; margin: 3px 0; }
-          .item-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 1px 0;
-            word-break: break-word;
-          }
-          .item-row span:first-child {
-            flex: 1;
-            margin-right: 4px;
-          }
-          .item-row span:last-child {
-            white-space: nowrap;
-          }
-          .total-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            font-weight: 900;
-            padding: 2px 0;
+            width: 58mm;
+            padding: 2mm;
+            white-space: pre;
           }
           .btn {
             display: block;
             width: 100%;
-            padding: 6px;
-            margin-bottom: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
             background: #ec4899;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
+            white-space: normal;
           }
           @media print {
             .btn { display: none; }
             body {
-              width: 52mm;
-              margin: 0;
-              padding: 0 1mm;
+              width: 58mm;
+              padding: 0;
+              font-size: 10px;
             }
             @page {
               size: 58mm auto;
-              margin: 0;
+              margin: 0mm 1mm;
             }
           }
         </style>
       </head>
       <body>
-        <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
-
-        <div class="center bold">DELICIAS DA MILA</div>
-        <div class="center">${pedido.tipoEntrega === "Retirada" ? "RETIRADA NO LOCAL" : "DELIVERY"}</div>
-        <div class="linha"></div>
-
-        <div>Pedido: #${pedido.id}</div>
-        <div>Cliente: ${pedido.clienteNome}</div>
-        <div>Tel: ${pedido.clienteTelefone}</div>
-        ${pedido.tipoEntrega !== "Retirada" ? `<div>End: ${pedido.endereco}</div>` : ""}
-        <div>Data: ${new Date(pedido.criadoEm).toLocaleString("pt-BR")}</div>
-
-        <div class="linha"></div>
-        <div class="bold">ITENS:</div>
-        ${itensHtml}
-        <div class="linha"></div>
-
-        ${pedido.tipoEntrega !== "Retirada" ? `
-        <div class="item-row">
-          <span>Taxa entrega</span>
-          <span>R$5,00</span>
-        </div>` : ""}
-
-        <div class="total-row">
-          <span>TOTAL</span>
-          <span>R$${pedido.total.toFixed(2)}</span>
-        </div>
-
-        <div class="linha"></div>
-        <div>Pgto: ${pedido.formaPagamento || "Nao informado"}</div>
-        ${pedido.formaPagamento === "Dinheiro" && pedido.troco > 0 ? `<div>Troco: R$${pedido.troco.toFixed(2)}</div>` : ""}
-        ${pedido.formaPagamento === "Pix" ? `<div>Pix: 81997307264</div>` : ""}
-
-        <div class="linha"></div>
-        <div class="center">Obrigado!</div>
-        <br>
-      </body>
+        <button class="btn" onclick="window.print()">🖨️ Imprimir Pedido</button>${conteudo}</body>
     </html>
   `)
   janela.document.close()
