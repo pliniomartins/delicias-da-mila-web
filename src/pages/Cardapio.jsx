@@ -89,10 +89,9 @@ export default function Cardapio() {
         itens: carrinho.map(i => ({ produtoId: i.id, quantidade: i.quantidade }))
       })
 
-      if (response.data.whatsapp) {
-        window.open(response.data.whatsapp, '_blank')
-      }
-
+    if (response.data.whatsapp) {
+  window.location.href = response.data.whatsapp
+}
       setCarrinho([])
       setForm({ clienteNome: '', clienteTelefone: '', endereco: '' })
       setTipoEntrega('Entrega')
