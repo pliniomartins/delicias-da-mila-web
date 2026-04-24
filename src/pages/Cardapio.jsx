@@ -233,7 +233,7 @@ export default function Cardapio() {
   // 📝 TELA DE DADOS
   if (tela === 'dados') return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position: 'sticky', top: 0, zIndex: 10 }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position:'relative' }}>
         <button onClick={() => setTela('carrinho')} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>←</button>
         <div>
           <div style={{ fontSize: '18px', fontWeight: 'bold' }}>📝 Seus Dados</div>
