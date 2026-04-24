@@ -10,7 +10,7 @@ export default function Cardapio() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null)
   const [loading, setLoading] = useState(true)
   const [carrinho, setCarrinho] = useState([])
-  const [tela, setTela] = useState('cardapio') // 'cardapio' | 'carrinho' | 'dados' | 'confirmado'
+  const [tela, setTela] = useState('cardapio')
   const [pedidoConfirmado, setPedidoConfirmado] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [tipoEntrega, setTipoEntrega] = useState('Entrega')
@@ -89,9 +89,6 @@ export default function Cardapio() {
         itens: carrinho.map(i => ({ produtoId: i.id, quantidade: i.quantidade }))
       })
 
-    if (response.data.whatsapp) {
-  window.location.href = response.data.whatsapp
-}
       setCarrinho([])
       setForm({ clienteNome: '', clienteTelefone: '', endereco: '' })
       setTipoEntrega('Entrega')
@@ -101,7 +98,8 @@ export default function Cardapio() {
       setPedidoConfirmado({
         tempoEspera: response.data.tempoEspera || TEMPO_ESPERA,
         previsao: response.data.previsao || previsao,
-        pedidoId: response.data.pedidoId
+        pedidoId: response.data.pedidoId,
+        whatsapp: response.data.whatsapp
       })
       setTela('confirmado')
 
@@ -127,21 +125,38 @@ export default function Cardapio() {
       <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>
         Pedido #{pedidoConfirmado?.pedidoId} enviado!
       </h1>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '32px' }}>
-        A Mila já recebeu seu pedido 🎉
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '24px' }}>
+        Clique abaixo para confirmar pelo WhatsApp 👇
       </p>
-      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '20px', padding: '28px 32px', marginBottom: '28px', width: '100%', maxWidth: '320px', boxSizing: 'border-box' }}>
-        <div style={{ fontSize: '40px', marginBottom: '10px' }}>⏱️</div>
-        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>TEMPO ESTIMADO</div>
-        <div style={{ fontSize: '52px', fontWeight: 'bold', color: '#ec4899', marginBottom: '4px', lineHeight: 1 }}>
+
+      {/* Botão WhatsApp */}
+      {pedidoConfirmado?.whatsapp && (
+        <a href={pedidoConfirmado.whatsapp} style={{
+          display: 'block', width: '100%', maxWidth: '320px',
+          padding: '16px', background: 'linear-gradient(135deg, #25d366, #128c7e)',
+          color: '#fff', borderRadius: '12px', fontSize: '16px',
+          fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif',
+          textAlign: 'center', textDecoration: 'none', marginBottom: '16px',
+          boxShadow: '0 4px 20px rgba(37,211,102,0.4)'
+        }}>
+          📲 Confirmar pedido no WhatsApp
+        </a>
+      )}
+
+      {/* Card de tempo */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '20px', padding: '24px 32px', marginBottom: '20px', width: '100%', maxWidth: '320px', boxSizing: 'border-box' }}>
+        <div style={{ fontSize: '36px', marginBottom: '8px' }}>⏱️</div>
+        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '6px' }}>TEMPO ESTIMADO</div>
+        <div style={{ fontSize: '44px', fontWeight: 'bold', color: '#ec4899', marginBottom: '4px', lineHeight: 1 }}>
           {pedidoConfirmado?.tempoEspera || TEMPO_ESPERA}
         </div>
-        <div style={{ fontSize: '20px', color: '#ec4899', marginBottom: '12px' }}>minutos</div>
+        <div style={{ fontSize: '18px', color: '#ec4899', marginBottom: '10px' }}>minutos</div>
         <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
           Previsão: até às <strong style={{ color: '#fff' }}>{pedidoConfirmado?.previsao}</strong>
         </div>
       </div>
-      <button onClick={() => setTela('cardapio')} style={{ background: 'linear-gradient(135deg, #ec4899, #be185d)', border: 'none', color: '#fff', padding: '16px', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif', width: '100%', maxWidth: '320px' }}>
+
+      <button onClick={() => setTela('cardapio')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '12px 32px', borderRadius: '12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Georgia, serif', width: '100%', maxWidth: '320px' }}>
         Voltar ao cardápio
       </button>
     </div>
@@ -150,7 +165,6 @@ export default function Cardapio() {
   // 🛒 TELA DO CARRINHO
   if (tela === 'carrinho') return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => setTela('cardapio')} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>←</button>
         <div>
@@ -159,7 +173,6 @@ export default function Cardapio() {
         </div>
       </div>
 
-      {/* Itens com scroll */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px' }}>
         {carrinho.length === 0 ? (
           <div style={{ textAlign: 'center', marginTop: '60px', color: 'rgba(255,255,255,0.3)' }}>
@@ -185,7 +198,6 @@ export default function Cardapio() {
         )}
       </div>
 
-      {/* Rodapé fixo */}
       {carrinho.length > 0 && (
         <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', background: '#141414' }}>
           <div style={{ marginBottom: '12px' }}>
@@ -195,7 +207,6 @@ export default function Cardapio() {
               <TipoBtn label="🏪 Retirada" active={tipoEntrega === 'Retirada'} onClick={() => setTipoEntrega('Retirada')} />
             </div>
           </div>
-
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
             <span>Subtotal</span><span>R$ {totalPreco.toFixed(2)}</span>
           </div>
@@ -211,7 +222,6 @@ export default function Cardapio() {
             <span>Total</span>
             <span style={{ color: '#ec4899' }}>R$ {totalFinal.toFixed(2)}</span>
           </div>
-
           <button onClick={() => setTela('dados')} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #ec4899, #be185d)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
             Continuar →
           </button>
@@ -220,10 +230,9 @@ export default function Cardapio() {
     </div>
   )
 
-  // 📝 TELA DE DADOS DO CLIENTE
+  // 📝 TELA DE DADOS
   if (tela === 'dados') return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => setTela('carrinho')} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>←</button>
         <div>
@@ -232,13 +241,11 @@ export default function Cardapio() {
         </div>
       </div>
 
-      {/* Formulário com scroll */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
           <FormInput placeholder="Seu nome" value={form.clienteNome} onChange={e => setForm({ ...form, clienteNome: e.target.value })} />
           <FormInput placeholder="Telefone (WhatsApp)" value={form.clienteTelefone} onChange={e => setForm({ ...form, clienteTelefone: e.target.value })} type="tel" />
-
           {tipoEntrega === 'Entrega' && (
             <FormInput placeholder="Endereço de entrega" value={form.endereco} onChange={e => setForm({ ...form, endereco: e.target.value })} />
           )}
@@ -279,7 +286,6 @@ export default function Cardapio() {
             ⏱️ Tempo estimado: <strong>{TEMPO_ESPERA} minutos</strong>
           </div>
 
-          {/* Resumo do pedido */}
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px' }}>
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '8px', letterSpacing: '1px' }}>RESUMO</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
@@ -294,15 +300,12 @@ export default function Cardapio() {
               <span>Total</span><span style={{ color: '#ec4899' }}>R$ {totalFinal.toFixed(2)}</span>
             </div>
           </div>
-
-          {/* Espaço extra para o botão fixo não cobrir */}
           <div style={{ height: '20px' }} />
         </div>
       </div>
 
-      {/* Botão SEMPRE visível no rodapé fixo */}
       <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', background: '#0f0f0f' }}>
-        <button onClick={handleFinalizarPedido} disabled={enviando} style={{ width: '100%', padding: '16px', background: enviando ? 'rgba(34,197,94,0.3)' : 'linear-gradient(135deg, #22c55e, #16a34a)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer', fontFamily: 'Georgia, serif', boxShadow: enviando ? 'none' : '0 4px 15px rgba(34,197,94,0.4)' }}>
+        <button onClick={handleFinalizarPedido} disabled={enviando} style={{ width: '100%', padding: '16px', background: enviando ? 'rgba(34,197,94,0.3)' : 'linear-gradient(135deg, #22c55e, #16a34a)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer', fontFamily: 'Georgia, serif' }}>
           {enviando ? 'Enviando...' : '✅ Finalizar Pedido'}
         </button>
       </div>
@@ -314,7 +317,6 @@ export default function Cardapio() {
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', position: 'relative' }}>
       <div style={{ position: 'fixed', top: '-200px', right: '-200px', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {/* Header */}
       <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15,15,15,0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img src={logo} alt="logo" style={{ width: '44px', height: '44px', borderRadius: '12px', objectFit: 'cover', objectPosition: 'top', border: '2px solid rgba(236,72,153,0.5)', flexShrink: 0 }} />
@@ -330,7 +332,6 @@ export default function Cardapio() {
         </button>
       </header>
 
-      {/* Categorias */}
       <div style={{ display: 'flex', gap: '8px', padding: '12px 16px', overflowX: 'auto', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
         <CatBtn label="Todos" active={!categoriaSelecionada} onClick={() => setCategoriaSelecionada(null)} />
         {categorias.map(cat => (
@@ -338,13 +339,11 @@ export default function Cardapio() {
         ))}
       </div>
 
-      {/* Contagem */}
       <div style={{ padding: '14px 16px 8px', color: 'rgba(255,255,255,0.3)', fontSize: '12px', letterSpacing: '1px' }}>
         {produtosFiltrados.length} {produtosFiltrados.length === 1 ? 'ITEM' : 'ITENS'}
         {categoriaSelecionada ? ` EM ${categoriaSelecionada.toUpperCase()}` : ' NO CARDÁPIO'}
       </div>
 
-      {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', padding: '8px 16px 80px' }}>
         {produtosFiltrados.map(produto => (
           <ProdutoCard key={produto.id} produto={produto} onAdicionar={() => adicionarAoCarrinho(produto)} quantidadeNoCarrinho={carrinho.find(i => i.id === produto.id)?.quantidade || 0} />
