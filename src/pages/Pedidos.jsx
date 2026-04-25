@@ -141,7 +141,8 @@ function Pedidos() {
       } else {
         if (ultimoIdRef.current === null) ultimoIdRef.current = 0;
       }
-      setPedidos(data);
+      const hoje = new Date().toDateString();
+      setPedidos(data.filter(p => new Date(p.criadoEm).toDateString() === hoje));
     } catch (error) {
       console.error("Erro ao buscar pedidos", error);
     }
