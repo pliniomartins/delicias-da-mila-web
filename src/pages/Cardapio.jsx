@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import api from '../services/api'
 import logo from '../assets/deliciasdamila.jpeg'
 
-const TEMPO_ESPERA = 30
+const TEMPO_ESPERA = "20 a 60"
 
 export default function Cardapio() {
   const [categorias, setCategorias] = useState([])
@@ -148,7 +148,7 @@ export default function Cardapio() {
         <div style={{ fontSize: '36px', marginBottom: '8px' }}>⏱️</div>
         <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '6px' }}>TEMPO ESTIMADO</div>
         <div style={{ fontSize: '44px', fontWeight: 'bold', color: '#ec4899', marginBottom: '4px', lineHeight: 1 }}>
-          {pedidoConfirmado?.tempoEspera || TEMPO_ESPERA}
+          {TEMPO_ESPERA}
         </div>
         <div style={{ fontSize: '18px', color: '#ec4899', marginBottom: '10px' }}>minutos</div>
         <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
@@ -233,7 +233,7 @@ export default function Cardapio() {
   // 📝 TELA DE DADOS
   if (tela === 'dados') return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: "'Georgia', serif", color: '#fff', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position:'relative' }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(15,15,15,0.95)', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => setTela('carrinho')} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>←</button>
         <div>
           <div style={{ fontSize: '18px', fontWeight: 'bold' }}>📝 Seus Dados</div>
