@@ -81,20 +81,13 @@ export default function Dashboard() {
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '10px', fontSize: '15px' }}>Gerencie seu negócio com estilo e sabor. 🍫</p>
 
-            {/* Cards de stats */}
-            <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            {/* Card pedidos */}
+            <div style={{ marginTop: '20px' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.05))', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '14px', padding: '14px 24px' }}>
                 <span style={{ fontSize: '28px' }}>📦</span>
                 <div>
                   <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#ec4899', lineHeight: 1 }}>{pedidosHoje}</div>
                   <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Pedidos hoje</div>
-                </div>
-              </div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', background: 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '14px', padding: '14px 24px' }}>
-                <span style={{ fontSize: '28px' }}>💰</span>
-                <div>
-                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#22c55e', lineHeight: 1 }}>R$ {totalHoje.toFixed(2)}</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Faturamento hoje</div>
                 </div>
               </div>
             </div>
