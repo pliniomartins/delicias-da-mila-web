@@ -31,9 +31,9 @@ export default function Cardapio() {
     carregar()
   }, [])
 
-  const produtosFiltrados = categoriaSelecionada
-    ? produtos.filter(p => p.categoriaNome === categoriaSelecionada)
-    : produtos
+  const produtosFiltrados = produtos
+    .filter(p => p.disponivel)
+    .filter(p => categoriaSelecionada ? p.categoriaNome === categoriaSelecionada : true)
 
   const totalItens = carrinho.reduce((acc, i) => acc + i.quantidade, 0)
   const totalPreco = carrinho.reduce((acc, i) => acc + i.preco * i.quantidade, 0)
