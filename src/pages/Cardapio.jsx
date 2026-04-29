@@ -4,6 +4,12 @@ import logo from '../assets/deliciasdamila.jpeg'
 
 const TEMPO_ESPERA = "20 a 60"
 
+function estaAberto() {
+  const agora = new Date()
+  const total = agora.getHours() * 60 + agora.getMinutes()
+  return total >= 18 * 60 && total < 23 * 60 + 30
+}
+
 export default function Cardapio() {
   const [categorias, setCategorias] = useState([])
   const [produtos, setProdutos] = useState([])
@@ -109,6 +115,19 @@ export default function Cardapio() {
       setEnviando(false)
     }
   }
+
+  if (!estaAberto()) return (
+    <div style={{ minHeight: "100vh", background: "#0f0f0f", fontFamily: "Georgia, serif", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", textAlign: "center" }}>
+      <img src={logo} alt="logo" style={{ width: "100px", height: "100px", borderRadius: "24px", objectFit: "cover", objectPosition: "top", border: "3px solid rgba(236,72,153,0.5)", marginBottom: "24px", boxShadow: "0 8px 40px rgba(236,72,153,0.3)" }} />
+      <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌙</div>
+      <h1 style={{ fontSize: "26px", fontWeight: "bold", marginBottom: "8px", color: "#fff" }}>Estamos fechados</h1>
+      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "15px", marginBottom: "32px", maxWidth: "320px" }}>Nosso horário de funcionamento é das 18h às 23h30. Volte em breve!</p>
+      <div style={{ background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.3)", borderRadius: "16px", padding: "20px 32px" }}>
+        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", letterSpacing: "2px", marginBottom: "8px" }}>HORÁRIO DE FUNCIONAMENTO</div>
+        <div style={{ fontSize: "20px", fontWeight: "bold", color: "#ec4899" }}>18:00 — 23:30</div>
+      </div>
+    </div>
+  )
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
