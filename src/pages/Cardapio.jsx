@@ -4,10 +4,29 @@ import logo from '../assets/deliciasdamila.jpeg'
 
 const TEMPO_ESPERA = "20 a 60"
 
+const BAIRROS = [
+  { nome: 'Caetés 1', taxa: 2.00 },
+  { nome: 'Caetés 2', taxa: 3.00 },
+  { nome: 'Caetés 3', taxa: 4.00 },
+  { nome: 'Caetés Velho', taxa: 3.00 },
+  { nome: 'Fosfato', taxa: 5.00 },
+  { nome: 'Planalto', taxa: 5.00 },
+  { nome: 'Matinha', taxa: 6.00 },
+  { nome: 'Alto São Miguel', taxa: 6.00 },
+  { nome: 'Desterro', taxa: 7.00 },
+  { nome: 'Alto Bela Vista', taxa: 5.00 },
+  { nome: 'Abreu Centro', taxa: 5.00 },
+  { nome: 'Paratibe', taxa: 7.00 },
+  { nome: 'Timbó', taxa: 5.00 },
+  { nome: 'Jaguaribe', taxa: 6.00 },
+  { nome: 'PE-18', taxa: 4.00 },
+  { nome: 'Quartzolit', taxa: 4.00 },
+]
+
 function estaAberto() {
   const agora = new Date()
   const total = agora.getHours() * 60 + agora.getMinutes()
-  return total >= 18 * 60 && total < 23 * 60 + 30
+  return total >= 16 * 60 && total < 23 * 60 + 30
 }
 
 export default function Cardapio() {
@@ -20,6 +39,7 @@ export default function Cardapio() {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [tipoEntrega, setTipoEntrega] = useState('Entrega')
+  const [bairroSelecionado, setBairroSelecionado] = useState('')
   const [formaPagamento, setFormaPagamento] = useState('')
   const [troco, setTroco] = useState('')
   const [form, setForm] = useState({ clienteNome: '', clienteTelefone: '', endereco: '' })
@@ -43,7 +63,8 @@ export default function Cardapio() {
 
   const totalItens = carrinho.reduce((acc, i) => acc + i.quantidade, 0)
   const totalPreco = carrinho.reduce((acc, i) => acc + i.preco * i.quantidade, 0)
-  const taxaEntrega = tipoEntrega === 'Entrega' ? 5 : 0
+  const bairroInfo = BAIRROS.find(b => b.nome === bairroSelecionado)
+  const taxaEntrega = tipoEntrega === 'Entrega' ? (bairroInfo?.taxa || 0) : 0
   const totalFinal = totalPreco + taxaEntrega
 
   function adicionarAoCarrinho(produto) {
@@ -75,6 +96,10 @@ export default function Cardapio() {
       alert('Preencha o endereço de entrega!')
       return
     }
+    if (tipoEntrega === 'Entrega' && !bairroSelecionado) {
+      alert('Selecione o bairro!')
+      return
+    }
     if (!formaPagamento) {
       alert('Selecione a forma de pagamento!')
       return
@@ -82,13 +107,17 @@ export default function Cardapio() {
     setEnviando(true)
     try {
       const now = new Date()
-      const previsao = new Date(now.getTime() + TEMPO_ESPERA * 60000)
+      const previsao = new Date(now.getTime() + 40 * 60000)
         .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+      const enderecoCompleto = tipoEntrega === 'Retirada'
+        ? 'Retirada no balcão'
+        : `${form.endereco} - ${bairroSelecionado}`
 
       const response = await api.post('/pedidos', {
         clienteNome: form.clienteNome,
         clienteTelefone: form.clienteTelefone,
-        endereco: tipoEntrega === 'Retirada' ? 'Retirada no balcão' : form.endereco,
+        endereco: enderecoCompleto,
         tipoEntrega,
         formaPagamento,
         troco: formaPagamento === 'Dinheiro' && troco ? parseFloat(troco) : 0,
@@ -98,6 +127,7 @@ export default function Cardapio() {
       setCarrinho([])
       setForm({ clienteNome: '', clienteTelefone: '', endereco: '' })
       setTipoEntrega('Entrega')
+      setBairroSelecionado('')
       setFormaPagamento('')
       setTroco('')
 
@@ -117,21 +147,21 @@ export default function Cardapio() {
   }
 
   if (!estaAberto()) return (
-    <div style={{ minHeight: "100vh", background: "#0f0f0f", fontFamily: "Georgia, serif", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", textAlign: "center" }}>
-      <img src={logo} alt="logo" style={{ width: "100px", height: "100px", borderRadius: "24px", objectFit: "cover", objectPosition: "top", border: "3px solid rgba(236,72,153,0.5)", marginBottom: "24px", boxShadow: "0 8px 40px rgba(236,72,153,0.3)" }} />
-      <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌙</div>
-      <h1 style={{ fontSize: "26px", fontWeight: "bold", marginBottom: "8px", color: "#fff" }}>Estamos fechados</h1>
-      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "15px", marginBottom: "32px", maxWidth: "320px" }}>Nosso horário de funcionamento é das 18h às 23h30. Volte em breve!</p>
-      <div style={{ background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.3)", borderRadius: "16px", padding: "20px 32px" }}>
-        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", letterSpacing: "2px", marginBottom: "8px" }}>HORÁRIO DE FUNCIONAMENTO</div>
-        <div style={{ fontSize: "20px", fontWeight: "bold", color: "#ec4899" }}>18:00 — 23:30</div>
+    <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: 'Georgia, serif', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
+      <img src={logo} alt='logo' style={{ width: '100px', height: '100px', borderRadius: '24px', objectFit: 'cover', objectPosition: 'top', border: '3px solid rgba(236,72,153,0.5)', marginBottom: '24px', boxShadow: '0 8px 40px rgba(236,72,153,0.3)' }} />
+      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌙</div>
+      <h1 style={{ fontSize: '26px', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>Estamos fechados</h1>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '32px', maxWidth: '320px' }}>Nosso horário de funcionamento é das 16h às 23h30. Volte em breve!</p>
+      <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '16px', padding: '20px 32px' }}>
+        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>HORÁRIO DE FUNCIONAMENTO</div>
+        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ec4899' }}>16:00 — 23:30</div>
       </div>
     </div>
   )
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-      <img src={logo} alt="logo" style={{ width: '80px', height: '80px', borderRadius: '20px', objectFit: 'cover', objectPosition: 'top', border: '2px solid rgba(236,72,153,0.5)', animation: 'pulseLogo 1.5s infinite' }} />
+      <img src={logo} alt='logo' style={{ width: '80px', height: '80px', borderRadius: '20px', objectFit: 'cover', objectPosition: 'top', border: '2px solid rgba(236,72,153,0.5)', animation: 'pulseLogo 1.5s infinite' }} />
       <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'Georgia, serif', letterSpacing: '2px', fontSize: '13px' }}>CARREGANDO CARDÁPIO...</p>
       <style>{`@keyframes pulseLogo { 0%,100%{opacity:1;} 50%{opacity:0.4;} }`}</style>
     </div>
@@ -147,34 +177,20 @@ export default function Cardapio() {
       <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '24px' }}>
         Clique abaixo para confirmar pelo WhatsApp 👇
       </p>
-
-      {/* Botão WhatsApp */}
       {pedidoConfirmado?.whatsapp && (
-        <a href={pedidoConfirmado.whatsapp} style={{
-          display: 'block', width: '100%', maxWidth: '320px',
-          padding: '16px', background: 'linear-gradient(135deg, #25d366, #128c7e)',
-          color: '#fff', borderRadius: '12px', fontSize: '16px',
-          fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif',
-          textAlign: 'center', textDecoration: 'none', marginBottom: '16px',
-          boxShadow: '0 4px 20px rgba(37,211,102,0.4)'
-        }}>
+        <a href={pedidoConfirmado.whatsapp} style={{ display: 'block', width: '100%', maxWidth: '320px', padding: '16px', background: 'linear-gradient(135deg, #25d366, #128c7e)', color: '#fff', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'Georgia, serif', textAlign: 'center', textDecoration: 'none', marginBottom: '16px', boxShadow: '0 4px 20px rgba(37,211,102,0.4)' }}>
           📲 Confirmar pedido no WhatsApp
         </a>
       )}
-
-      {/* Card de tempo */}
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '20px', padding: '24px 32px', marginBottom: '20px', width: '100%', maxWidth: '320px', boxSizing: 'border-box' }}>
         <div style={{ fontSize: '36px', marginBottom: '8px' }}>⏱️</div>
         <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '6px' }}>TEMPO ESTIMADO</div>
-        <div style={{ fontSize: '44px', fontWeight: 'bold', color: '#ec4899', marginBottom: '4px', lineHeight: 1 }}>
-          {TEMPO_ESPERA}
-        </div>
+        <div style={{ fontSize: '44px', fontWeight: 'bold', color: '#ec4899', marginBottom: '4px', lineHeight: 1 }}>{TEMPO_ESPERA}</div>
         <div style={{ fontSize: '18px', color: '#ec4899', marginBottom: '10px' }}>minutos</div>
         <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
           Previsão: até às <strong style={{ color: '#fff' }}>{pedidoConfirmado?.previsao}</strong>
         </div>
       </div>
-
       <button onClick={() => setTela('cardapio')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '12px 32px', borderRadius: '12px', fontSize: '14px', cursor: 'pointer', fontFamily: 'Georgia, serif', width: '100%', maxWidth: '320px' }}>
         Voltar ao cardápio
       </button>
@@ -231,10 +247,10 @@ export default function Cardapio() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '10px' }}>
             <span style={{ color: tipoEntrega === 'Retirada' ? '#22c55e' : 'rgba(255,255,255,0.5)' }}>
-              {tipoEntrega === 'Retirada' ? '✅ Sem taxa' : 'Taxa de entrega'}
+              {tipoEntrega === 'Retirada' ? '✅ Sem taxa' : bairroSelecionado ? `Taxa - ${bairroSelecionado}` : 'Taxa de entrega'}
             </span>
             <span style={{ color: tipoEntrega === 'Retirada' ? '#22c55e' : 'rgba(255,255,255,0.5)' }}>
-              {tipoEntrega === 'Retirada' ? 'Grátis' : 'R$ 5,00'}
+              {tipoEntrega === 'Retirada' ? 'Grátis' : bairroSelecionado ? `R$ ${taxaEntrega.toFixed(2)}` : 'Selecione o bairro'}
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 'bold', marginBottom: '14px' }}>
@@ -265,9 +281,34 @@ export default function Cardapio() {
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEUS DADOS</div>
           <FormInput placeholder="Seu nome" value={form.clienteNome} onChange={e => setForm({ ...form, clienteNome: e.target.value })} />
           <FormInput placeholder="Telefone (WhatsApp)" value={form.clienteTelefone} onChange={e => setForm({ ...form, clienteTelefone: e.target.value })} type="tel" />
+
           {tipoEntrega === 'Entrega' && (
-            <FormInput placeholder="Endereço de entrega" value={form.endereco} onChange={e => setForm({ ...form, endereco: e.target.value })} />
+            <>
+              {/* Dropdown de bairro */}
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>SEU BAIRRO</div>
+              <select
+                value={bairroSelecionado}
+                onChange={e => setBairroSelecionado(e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: `1px solid ${bairroSelecionado ? 'rgba(236,72,153,0.5)' : 'rgba(255,255,255,0.1)'}`, color: bairroSelecionado ? '#fff' : 'rgba(255,255,255,0.3)', padding: '13px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
+              >
+                <option value="">Selecione seu bairro</option>
+                {BAIRROS.map(b => (
+                  <option key={b.nome} value={b.nome} style={{ background: '#1a1a1a', color: '#fff' }}>
+                    {b.nome} — R$ {b.taxa.toFixed(2)} de taxa
+                  </option>
+                ))}
+              </select>
+
+              {bairroSelecionado && (
+                <div style={{ background: 'rgba(236,72,153,0.08)', border: '1px solid rgba(236,72,153,0.2)', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', color: '#ec4899', textAlign: 'center' }}>
+                  🛵 Taxa de entrega para {bairroSelecionado}: <strong>R$ {bairroInfo?.taxa.toFixed(2)}</strong>
+                </div>
+              )}
+
+              <FormInput placeholder="Endereço completo (rua, número)" value={form.endereco} onChange={e => setForm({ ...form, endereco: e.target.value })} />
+            </>
           )}
+
           {tipoEntrega === 'Retirada' && (
             <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#22c55e' }}>
               🏪 Você retirará o pedido no balcão
@@ -277,13 +318,7 @@ export default function Cardapio() {
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '1px', marginTop: '8px' }}>FORMA DE PAGAMENTO</div>
           <div style={{ display: 'flex', gap: '8px' }}>
             {['Dinheiro', 'Pix', 'Cartão'].map(op => (
-              <button key={op} onClick={() => setFormaPagamento(op)} style={{
-                flex: 1, padding: '10px 4px', borderRadius: '10px', cursor: 'pointer',
-                border: formaPagamento === op ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)',
-                background: formaPagamento === op ? 'rgba(236,72,153,0.15)' : 'transparent',
-                color: formaPagamento === op ? '#ec4899' : 'rgba(255,255,255,0.4)',
-                fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif'
-              }}>
+              <button key={op} onClick={() => setFormaPagamento(op)} style={{ flex: 1, padding: '10px 4px', borderRadius: '10px', cursor: 'pointer', border: formaPagamento === op ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: formaPagamento === op ? 'rgba(236,72,153,0.15)' : 'transparent', color: formaPagamento === op ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: 'bold', fontFamily: 'Georgia, serif' }}>
                 {op === 'Dinheiro' ? '💵' : op === 'Pix' ? '🔑' : '💳'}<br />{op}
               </button>
             ))}
@@ -305,14 +340,15 @@ export default function Cardapio() {
             ⏱️ Tempo estimado: <strong>{TEMPO_ESPERA} minutos</strong>
           </div>
 
+          {/* Resumo */}
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px' }}>
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '8px', letterSpacing: '1px' }}>RESUMO</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
               <span>Subtotal</span><span>R$ {totalPreco.toFixed(2)}</span>
             </div>
-            {tipoEntrega === 'Entrega' && (
+            {tipoEntrega === 'Entrega' && bairroSelecionado && (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
-                <span>Taxa de entrega</span><span>R$ 5,00</span>
+                <span>Taxa - {bairroSelecionado}</span><span>R$ {taxaEntrega.toFixed(2)}</span>
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 'bold', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -375,7 +411,7 @@ export default function Cardapio() {
 
       <style>{`
         * { -webkit-tap-highlight-color: transparent; }
-        input { font-size: 16px !important; }
+        input, select { font-size: 16px !important; }
         ::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
