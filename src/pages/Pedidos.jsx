@@ -101,7 +101,7 @@ td { font-size:8pt; font-weight:bold; vertical-align:top; }
 
   janela.document.close()
   janela.focus()
-  setTimeout(() => { janela.print() }, 800)
+  setTimeout(() => { janela.print() }, 500)
 }
 
 function Pedidos() {
@@ -182,8 +182,8 @@ function Pedidos() {
     return () => clearInterval(interval);
   }, []);
 
-  const pedidosHoje = pedidos.filter(p => new Date(p.criadoEm).toDateString() === new Date().toDateString()).length;
-  const totalHoje = pedidos.filter(p => new Date(p.criadoEm).toDateString() === new Date().toDateString()).reduce((acc, p) => acc + p.total, 0);
+  const pedidosHoje = pedidos.length;
+  const totalHoje = pedidos.reduce((acc, p) => acc + p.total, 0);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f0f0f", fontFamily: "'Georgia', serif", color: "#fff", position: "relative", overflow: "hidden" }}>
