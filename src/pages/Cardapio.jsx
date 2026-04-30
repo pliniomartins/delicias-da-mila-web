@@ -289,7 +289,7 @@ export default function Cardapio() {
               <select
                 value={bairroSelecionado}
                 onChange={e => setBairroSelecionado(e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: bairroSelecionado ? '#fff' : 'rgba(255,255,255,0.3)', padding: '13px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '13px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
               >
                 <option value=''>Selecione seu bairro</option>
                 <option value='Caetés 1'>Caetés 1 — R$ 2,00</option>
