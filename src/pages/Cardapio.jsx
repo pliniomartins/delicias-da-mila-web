@@ -27,7 +27,7 @@ function estaAberto(adminMode = false) {
   if (adminMode) return true
   const agora = new Date()
   const total = agora.getHours() * 60 + agora.getMinutes()
-  return total >= 16 * 60 && total < 23 * 60 + 30
+  return total >= 16 * 60
 }
 
 export default function Cardapio({ adminMode = false }) {
@@ -153,10 +153,10 @@ export default function Cardapio({ adminMode = false }) {
       <img src={logo} alt='logo' style={{ width: '100px', height: '100px', borderRadius: '24px', objectFit: 'cover', objectPosition: 'top', border: '3px solid rgba(236,72,153,0.5)', marginBottom: '24px', boxShadow: '0 8px 40px rgba(236,72,153,0.3)' }} />
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌙</div>
       <h1 style={{ fontSize: '26px', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>Estamos fechados</h1>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '32px', maxWidth: '320px' }}>Nosso horário de funcionamento é das 16h às 23h30. Volte em breve!</p>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '32px', maxWidth: '320px' }}>Nosso horário de funcionamento é das 16h às 00h. Volte em breve!</p>
       <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '16px', padding: '20px 32px' }}>
         <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>HORÁRIO DE FUNCIONAMENTO</div>
-        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ec4899' }}>16:00 — 23:30</div>
+        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ec4899' }}>16:00 — 00:00</div>
       </div>
     </div>
   )
