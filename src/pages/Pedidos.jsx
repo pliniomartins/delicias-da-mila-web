@@ -4,6 +4,25 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://delicias-da-mila-api-production.up.railway.app/api";
 
+function toLocaleBR(dateStr) {
+  return new Date(dateStr).toLocaleTimeString('pt-BR', {
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/Recife'
+  })
+}
+
+function toLocaleDateBR(dateStr) {
+  return new Date(dateStr).toLocaleString('pt-BR', {
+    timeZone: 'America/Recife'
+  })
+}
+
+function toDateBR(dateStr) {
+  return new Date(dateStr).toLocaleDateString('pt-BR', {
+    timeZone: 'America/Recife'
+  })
+}
+
 const STATUS_ENUM = {
   Pendente: 0,
   Confirmado: 1,
@@ -63,7 +82,7 @@ td { font-size:8pt; font-weight:bold; vertical-align:top; }
   <tr><td colspan="2">Cliente: ${pedido.clienteNome}</td></tr>
   <tr><td colspan="2">Tel: ${pedido.clienteTelefone}</td></tr>
   ${pedido.tipoEntrega !== 'Retirada' ? `<tr><td colspan="2">End: ${pedido.endereco}</td></tr>` : ''}
-  <tr><td colspan="2">Data: ${new Date(pedido.criadoEm).toLocaleString('pt-BR')}</td></tr>
+  <tr><td colspan="2">Data: ${toLocaleDateBR(pedido.criadoEm)}</td></tr>
 </table>
 
 <div class="sep"></div>
@@ -142,7 +161,7 @@ function Pedidos() {
         if (ultimoIdRef.current === null) ultimoIdRef.current = 0;
       }
       const hoje = new Date().toDateString();
-      setPedidos(data.filter(p => new Date(p.criadoEm).toDateString() === hoje));
+      setPedidos(data.filter(p => toDateBR(p.criadoEm) === new Date().toLocaleDateString('pt-BR', {timeZone: 'America/Recife'})));
     } catch (error) {
       console.error("Erro ao buscar pedidos", error);
     }
@@ -217,7 +236,7 @@ function Pedidos() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "32px" }}>
           <StatCard emoji="📦" label="Pedidos hoje" value={pedidosHoje} cor="236,72,153" />
           <StatCard emoji="💰" label="Faturamento hoje" value={`R$ ${totalHoje.toFixed(2)}`} cor="34,197,94" />
-          <StatCard emoji="🕐" label="Último pedido" cor="249,115,22" value={pedidos.length > 0 ? new Date(pedidos[0].criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"} />
+          <StatCard emoji="🕐" label="Último pedido" cor="249,115,22" value={pedidos.length > 0 ? toLocaleBR(pedidos[0].criadoEm) : "--:--"} />
         </div>
 
         <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", letterSpacing: "1px", marginBottom: "16px" }}>
@@ -297,7 +316,7 @@ function PedidoCard({ pedido, isNovo, onAtualizarStatus }) {
           <div style={{ background: `rgba(${status.cor},0.15)`, border: `1px solid rgba(${status.cor},0.4)`, color: `rgb(${status.cor})`, padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: "bold" }}>{status.label}</div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "18px", fontWeight: "bold", color: "#ec4899" }}>R$ {pedido.total.toFixed(2)}</div>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{new Date(pedido.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{toLocaleBR(pedido.criadoEm)}</div>
           </div>
           <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "18px", transition: "transform 0.2s", transform: expandido ? "rotate(180deg)" : "rotate(0deg)" }}>▾</div>
         </div>
