@@ -5,22 +5,21 @@ import { useNavigate } from "react-router-dom";
 const API_URL = "https://delicias-da-mila-api-production.up.railway.app/api";
 
 function toLocaleBR(dateStr) {
-  return new Date(dateStr).toLocaleTimeString('pt-BR', {
-    hour: '2-digit', minute: '2-digit',
-    timeZone: 'America/Recife'
-  })
+  const d = new Date(dateStr)
+  d.setHours(d.getHours() - 3)
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
 function toLocaleDateBR(dateStr) {
-  return new Date(dateStr).toLocaleString('pt-BR', {
-    timeZone: 'America/Recife'
-  })
+  const d = new Date(dateStr)
+  d.setHours(d.getHours() - 3)
+  return d.toLocaleString('pt-BR')
 }
 
 function toDateBR(dateStr) {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    timeZone: 'America/Recife'
-  })
+  const d = new Date(dateStr)
+  d.setHours(d.getHours() - 3)
+  return d.toLocaleDateString('pt-BR')
 }
 
 const STATUS_ENUM = {
@@ -388,3 +387,4 @@ function BotaoAcao({ label, cor, onClick, disabled, outline }) {
 }
 
 export default Pedidos;
+

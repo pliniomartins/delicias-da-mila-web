@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron.cjs",
+  "homepage": "https://pliniomartins.github.io/delicias-da-mila-web",
   "description": "Sistema de pedidos Delícias da Mila",
   "author": "Delícias da Mila",
   "scripts": {
@@ -12,13 +13,16 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron": "electron .",
-    "dist": "electron-builder"
+    "dist": "vite build && electron-builder",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "build": {
     "appId": "com.deliciasdamila.app",
     "productName": "Delícias da Mila",
     "files": [
       "electron.cjs",
+      "dist/**/*",
       "public/**/*"
     ],
     "win": {
@@ -49,6 +53,7 @@
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "gh-pages": "^6.0.0",
     "globals": "^17.4.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
