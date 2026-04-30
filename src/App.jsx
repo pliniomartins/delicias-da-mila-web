@@ -18,7 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/cardapio" element={<Cardapio />} />
-        
+          <Route path="/cardapio-admin" element={<Cardapio adminMode={true} />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/produtos" element={<PrivateRoute><Produtos /></PrivateRoute>} />
           <Route path="/pedidos" element={<PrivateRoute><Pedidos /></PrivateRoute>} />

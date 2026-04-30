@@ -23,13 +23,14 @@ const BAIRROS = [
   { nome: 'Quartzolit', taxa: 4.00 },
 ]
 
-function estaAberto() {
+function estaAberto(adminMode = false) {
+  if (adminMode) return true
   const agora = new Date()
   const total = agora.getHours() * 60 + agora.getMinutes()
   return total >= 16 * 60 && total < 23 * 60 + 30
 }
 
-export default function Cardapio() {
+export default function Cardapio({ adminMode = false }) {
   const [categorias, setCategorias] = useState([])
   const [produtos, setProdutos] = useState([])
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null)
@@ -121,6 +122,7 @@ export default function Cardapio() {
         tipoEntrega,
         formaPagamento,
         troco: formaPagamento === 'Dinheiro' && troco ? parseFloat(troco) : 0,
+        taxaEntrega,
         itens: carrinho.map(i => ({ produtoId: i.id, quantidade: i.quantidade }))
       })
 
@@ -146,7 +148,7 @@ export default function Cardapio() {
     }
   }
 
-  if (!estaAberto()) return (
+  if (!estaAberto(adminMode)) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: 'Georgia, serif', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
       <img src={logo} alt='logo' style={{ width: '100px', height: '100px', borderRadius: '24px', objectFit: 'cover', objectPosition: 'top', border: '3px solid rgba(236,72,153,0.5)', marginBottom: '24px', boxShadow: '0 8px 40px rgba(236,72,153,0.3)' }} />
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌙</div>
