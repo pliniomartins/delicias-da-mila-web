@@ -289,14 +289,25 @@ export default function Cardapio() {
               <select
                 value={bairroSelecionado}
                 onChange={e => setBairroSelecionado(e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: `1px solid ${bairroSelecionado ? 'rgba(236,72,153,0.5)' : 'rgba(255,255,255,0.1)'}`, color: bairroSelecionado ? '#fff' : 'rgba(255,255,255,0.3)', padding: '13px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: bairroSelecionado ? '#fff' : 'rgba(255,255,255,0.3)', padding: '13px 14px', borderRadius: '10px', fontSize: '16px', fontFamily: 'Georgia, serif', outline: 'none' }}
               >
-                <option value="">Selecione seu bairro</option>
-                {BAIRROS.map(b => (
-                  <option key={b.nome} value={b.nome} style={{ background: '#1a1a1a', color: '#fff' }}>
-                    {b.nome} — R$ {b.taxa.toFixed(2)} de taxa
-                  </option>
-                ))}
+                <option value=''>Selecione seu bairro</option>
+                <option value='Caetés 1'>Caetés 1 — R$ 2,00</option>
+                <option value='Caetés 2'>Caetés 2 — R$ 3,00</option>
+                <option value='Caetés 3'>Caetés 3 — R$ 4,00</option>
+                <option value='Caetés Velho'>Caetés Velho — R$ 3,00</option>
+                <option value='Fosfato'>Fosfato — R$ 5,00</option>
+                <option value='Planalto'>Planalto — R$ 5,00</option>
+                <option value='Matinha'>Matinha — R$ 6,00</option>
+                <option value='Alto São Miguel'>Alto São Miguel — R$ 6,00</option>
+                <option value='Desterro'>Desterro — R$ 7,00</option>
+                <option value='Alto Bela Vista'>Alto Bela Vista — R$ 5,00</option>
+                <option value='Abreu Centro'>Abreu Centro — R$ 5,00</option>
+                <option value='Paratibe'>Paratibe — R$ 7,00</option>
+                <option value='Timbó'>Timbó — R$ 5,00</option>
+                <option value='Jaguaribe'>Jaguaribe — R$ 6,00</option>
+                <option value='PE-18'>PE-18 — R$ 4,00</option>
+                <option value='Quartzolit'>Quartzolit — R$ 4,00</option>
               </select>
 
               {bairroSelecionado && (
