@@ -23,19 +23,26 @@ const BAIRROS = [
   { nome: 'Quartzolit', taxa: 4.00 },
 ]
 
+function getDiaBrasilia() {
+  const agora = new Date()
+  const brasiliaStr = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Recife', weekday: 'long' })
+  if (brasiliaStr.includes('segunda')) return 1
+  if (brasiliaStr.includes('terça')) return 2
+  return 0
+}
+
 function estaAberto(adminMode = false) {
   if (adminMode) return true
+  const dia = getDiaBrasilia()
+  if (dia === 1 || dia === 2) return false
   const agora = new Date()
-  const diaSemana = agora.getDay() // 0=domingo, 1=segunda, 2=terça...
-  if (diaSemana === 1 || diaSemana === 2) return false
-  const total = agora.getHours() * 60 + agora.getMinutes()
-  return total >= 16 * 60
+  const hora = parseInt(agora.toLocaleTimeString('pt-BR', { timeZone: 'America/Recife', hour: '2-digit' }))
+  return hora >= 16
 }
 
 function getMotivoFechado() {
-  const agora = new Date()
-  const diaSemana = agora.getDay()
-  if (diaSemana === 1 || diaSemana === 2) return 'folga'
+  const dia = getDiaBrasilia()
+  if (dia === 1 || dia === 2) return 'folga'
   return 'horario'
 }
 
