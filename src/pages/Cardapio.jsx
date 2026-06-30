@@ -25,10 +25,11 @@ const BAIRROS = [
 
 function getDiaBrasilia() {
   const agora = new Date()
-  const brasiliaStr = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Recife', weekday: 'long' })
-  if (brasiliaStr.includes('segunda')) return 1
-  if (brasiliaStr.includes('terça')) return 2
-  return 0
+  // Pega a data em Brasilia e extrai o dia da semana
+  const dataStr = agora.toLocaleDateString('en-US', { timeZone: 'America/Recife', weekday: 'short' })
+  if (dataStr === 'Mon') return 1
+  if (dataStr === 'Tue') return 2
+  return agora.getDay()
 }
 
 function estaAberto(adminMode = false) {
