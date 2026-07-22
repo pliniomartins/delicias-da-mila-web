@@ -190,7 +190,6 @@ export default function Cardapio({ adminMode = false }) {
     </div>
     )
   }
-  )
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
