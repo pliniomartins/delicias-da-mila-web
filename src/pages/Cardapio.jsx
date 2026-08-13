@@ -23,31 +23,17 @@ const BAIRROS = [
   { nome: 'Quartzolit', taxa: 4.00 },
 ]
 
-function getDiaBrasilia() {
-  const agora = new Date()
-  // Pega a data em Brasilia e extrai o dia da semana
-  const dataStr = agora.toLocaleDateString('en-US', { timeZone: 'America/Recife', weekday: 'short' })
-  if (dataStr === 'Mon') return 1
-  if (dataStr === 'Tue') return 2
-  return agora.getDay()
-}
 
-function estaAberto(adminMode = false) {
-  if (adminMode) return true
-  const dia = getDiaBrasilia()
-  if (dia === 1 || dia === 2) return false
-  const agora = new Date()
-  const hora = parseInt(agora.toLocaleTimeString('pt-BR', { timeZone: 'America/Recife', hour: '2-digit' }))
-  return hora >= 16
-}
 
-function getMotivoFechado() {
-  const dia = getDiaBrasilia()
-  if (dia === 1 || dia === 2) return 'folga'
-  return 'horario'
-}
+export default function Cardapio() {
+  const [lojaFechada, setLojaFechada] = useState(false)
 
-export default function Cardapio({ adminMode = false }) {
+  useEffect(() => {
+    fetch('https://delicias-da-mila-api-production.up.railway.app/api/Loja/status')
+      .then(r => r.json())
+      .then(data => setLojaFechada(!data.aberta))
+      .catch(() => {})
+  }, [])
   const [categorias, setCategorias] = useState([])
   const [produtos, setProdutos] = useState([])
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null)
@@ -165,31 +151,17 @@ export default function Cardapio({ adminMode = false }) {
     }
   }
 
-  if (!estaAberto(adminMode)) {
-    const motivo = getMotivoFechado()
-    return (
+  if (lojaFechada) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: 'Georgia, serif', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
       <img src={logo} alt='logo' style={{ width: '100px', height: '100px', borderRadius: '24px', objectFit: 'cover', objectPosition: 'top', border: '3px solid rgba(236,72,153,0.5)', marginBottom: '24px', boxShadow: '0 8px 40px rgba(236,72,153,0.3)' }} />
-      <div style={{ fontSize: '48px', marginBottom: '16px' }}>{motivo === 'folga' ? '📅' : '🌙'}</div>
-      <h1 style={{ fontSize: '26px', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>
-        {motivo === 'folga' ? 'Fechado hoje' : 'Estamos fechados'}
-      </h1>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '32px', maxWidth: '320px' }}>
-        {motivo === 'folga'
-          ? 'Não abrimos às segundas e terças-feiras. Te esperamos a partir de quarta-feira! 💕'
-          : 'Nosso horário de funcionamento é das 16h às 00h. Volte em breve!'}
-      </p>
+      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
+      <h1 style={{ fontSize: '26px', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>Temporariamente fechado</h1>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginBottom: '32px', maxWidth: '320px' }}>Estamos em pausa no momento. Voltamos em breve com muito sabor! 🍫</p>
       <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '16px', padding: '20px 32px' }}>
-        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', letterSpacing: '2px', marginBottom: '8px' }}>
-          {motivo === 'folga' ? 'DIAS DE FUNCIONAMENTO' : 'HORÁRIO DE FUNCIONAMENTO'}
-        </div>
-        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ec4899' }}>
-          {motivo === 'folga' ? 'Quarta a Domingo' : '16:00 — 00:00'}
-        </div>
+        <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ec4899' }}>Voltamos em breve! 💕</div>
       </div>
     </div>
-    )
-  }
+  )
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>

@@ -10,7 +10,8 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [hora, setHora] = useState('')
   const [pedidosHoje, setPedidosHoje] = useState(0)
-  const [totalHoje, setTotalHoje] = useState(0)
+  const [lojaAberta, setLojaAberta] = useState(true)
+  const [alterando, setAlterando] = useState(false)
 
   useEffect(() => {
     const atualizar = () => {
@@ -23,16 +24,40 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
+    // Buscar pedidos do dia
     fetch(`${API_URL}/Pedidos`)
       .then(r => r.json())
       .then(data => {
-        const hoje = new Date().toDateString()
-        const pedidosDia = data.filter(p => new Date(p.criadoEm).toDateString() === hoje)
+        const hoje = new Date().toLocaleDateString('pt-BR')
+        const pedidosDia = data.filter(p => {
+          const d = new Date(p.criadoEm)
+          d.setHours(d.getHours() - 3)
+          return d.toLocaleDateString('pt-BR') === hoje
+        })
         setPedidosHoje(pedidosDia.length)
-        setTotalHoje(pedidosDia.reduce((acc, p) => acc + p.total, 0))
       })
       .catch(() => {})
+
+    // Buscar status da loja
+    fetch(`${API_URL}/Loja/status`)
+      .then(r => r.json())
+      .then(data => setLojaAberta(data.aberta))
+      .catch(() => {})
   }, [])
+
+  async function toggleLoja() {
+    setAlterando(true)
+    try {
+      const endpoint = lojaAberta ? 'fechar' : 'abrir'
+      const res = await fetch(`${API_URL}/Loja/${endpoint}`, { method: 'POST' })
+      const data = await res.json()
+      setLojaAberta(data.aberta)
+    } catch {
+      alert('Erro ao alterar status da loja!')
+    } finally {
+      setAlterando(false)
+    }
+  }
 
   function handleLogout() {
     logout()
@@ -64,7 +89,7 @@ export default function Dashboard() {
               {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase()}
             </div>
           </div>
-          <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid rgba(236,72,153,0.5)', color: '#ec4899', padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}
+          <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid rgba(236,72,153,0.5)', color: '#ec4899', padding: '8px 20px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}
             onMouseEnter={e => { e.target.style.background = '#ec4899'; e.target.style.color = '#fff' }}
             onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.color = '#ec4899' }}>
             Sair
@@ -73,7 +98,7 @@ export default function Dashboard() {
       </header>
 
       <main style={{ padding: '48px 40px', maxWidth: '1100px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginBottom: '48px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '40px', marginBottom: '40px', flexWrap: 'wrap' }}>
           <img src={logo} alt="Delícias da Mila" style={{ width: '160px', height: '160px', borderRadius: '28px', objectFit: 'cover', objectPosition: 'top', border: '3px solid rgba(236,72,153,0.4)', boxShadow: '0 8px 40px rgba(236,72,153,0.25)' }} />
           <div>
             <h2 style={{ fontSize: '38px', fontWeight: 'bold', margin: 0, background: 'linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.4))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
@@ -81,8 +106,7 @@ export default function Dashboard() {
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '10px', fontSize: '15px' }}>Gerencie seu negócio com estilo e sabor. 🍫</p>
 
-            {/* Card pedidos */}
-            <div style={{ marginTop: '20px' }}>
+            <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.05))', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '14px', padding: '14px 24px' }}>
                 <span style={{ fontSize: '28px' }}>📦</span>
                 <div>
@@ -92,6 +116,27 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* BOTÃO LIGA/DESLIGA LOJA */}
+        <div style={{ background: lojaAberta ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${lojaAberta ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, borderRadius: '20px', padding: '24px 32px', marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: lojaAberta ? '#22c55e' : '#ef4444', boxShadow: `0 0 8px ${lojaAberta ? '#22c55e' : '#ef4444'}`, animation: lojaAberta ? 'pulse 2s infinite' : 'none' }} />
+              <div style={{ fontSize: '20px', fontWeight: 'bold', color: lojaAberta ? '#22c55e' : '#ef4444' }}>
+                {lojaAberta ? 'Loja Aberta' : 'Loja Fechada'}
+              </div>
+            </div>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+              {lojaAberta
+                ? 'O cardápio está visível e aceitando pedidos normalmente'
+                : 'O cardápio está fechado — clientes veem mensagem de "Voltamos em breve"'}
+            </div>
+          </div>
+          <button onClick={toggleLoja} disabled={alterando}
+            style={{ padding: '14px 32px', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: alterando ? 'not-allowed' : 'pointer', fontFamily: 'Georgia, serif', border: 'none', transition: 'all 0.2s', background: lojaAberta ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', boxShadow: lojaAberta ? '0 4px 15px rgba(239,68,68,0.4)' : '0 4px 15px rgba(34,197,94,0.4)', opacity: alterando ? 0.6 : 1 }}>
+            {alterando ? 'Aguarde...' : lojaAberta ? '🔴 Fechar Loja' : '🟢 Abrir Loja'}
+          </button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
@@ -104,6 +149,7 @@ export default function Dashboard() {
           DELÍCIAS DA MILA © {new Date().getFullYear()} — FEITO COM ❤️
         </div>
       </main>
+      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`}</style>
     </div>
   )
 }
@@ -124,7 +170,6 @@ function NavCard({ emoji, title, desc, color, onClick, badge, pulse }) {
       <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>{title}</div>
       <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.5' }}>{desc}</div>
       <div style={{ marginTop: '24px', fontSize: '12px', color: hovered ? color : 'rgba(255,255,255,0.2)', transition: 'color 0.3s', letterSpacing: '1px' }}>ACESSAR →</div>
-      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`}</style>
     </div>
   )
 }
